@@ -1,0 +1,90 @@
+{
+  "year": 2026,
+  "holidays": [
+    {
+      "title": "New Year's Day",
+      "startDate": "2026-01-01",
+      "importance": "high",
+      "notes": "Start of the new year. High retail activity for fitness, health, and resolution-related products.",
+      "tags": ["retail", "fitness", "new-beginnings"]
+    },
+    {
+      "title": "Human Rights Day",
+      "startDate": "2026-03-21",
+      "importance": "high",
+      "notes": "Commemorates the Sharpeville massacre. Focus on community, equality, and social causes.",
+      "tags": ["heritage", "community"]
+    },
+    {
+      "title": "Good Friday",
+      "startDate": "2026-04-03",
+      "importance": "high",
+      "notes": "Christian holiday. Many businesses closed. Travel and family gatherings.",
+      "tags": ["religious", "travel", "family"]
+    },
+    {
+      "title": "Family Day",
+      "startDate": "2026-04-06",
+      "importance": "med",
+      "notes": "Easter Monday. Long weekend, family activities, and outdoor events.",
+      "tags": ["family", "outdoor", "travel"]
+    },
+    {
+      "title": "Freedom Day",
+      "startDate": "2026-04-27",
+      "importance": "high",
+      "notes": "Celebrates the first democratic elections in 1994. National pride and heritage focus.",
+      "tags": ["heritage", "national-pride"]
+    },
+    {
+      "title": "Workers' Day",
+      "startDate": "2026-05-01",
+      "importance": "high",
+      "notes": "International Workers' Day. Labour rights focus. Retail promotions common.",
+      "tags": ["retail", "workers"]
+    },
+    {
+      "title": "Youth Day",
+      "startDate": "2026-06-16",
+      "importance": "high",
+      "notes": "Commemorates the 1976 Soweto uprising. Youth-focused campaigns and education themes.",
+      "tags": ["youth", "education", "heritage"]
+    },
+    {
+      "title": "National Women's Day",
+      "startDate": "2026-08-09",
+      "importance": "high",
+      "notes": "Celebrates the 1956 women's march. Women-focused campaigns, beauty, wellness, empowerment.",
+      "tags": ["women", "empowerment", "wellness", "beauty"]
+    },
+    {
+      "title": "Heritage Day",
+      "startDate": "2026-09-24",
+      "importance": "high",
+      "notes": "Also known as Braai Day. Celebrates SA's diverse culture. Food, family, and outdoor activities.",
+      "tags": ["heritage", "braai", "food", "outdoor"]
+    },
+    {
+      "title": "Day of Reconciliation",
+      "startDate": "2026-12-16",
+      "importance": "high",
+      "notes": "Promotes national unity. Start of festive retail season peak.",
+      "tags": ["heritage", "festive", "retail"]
+    },
+    {
+      "title": "Christmas Day",
+      "startDate": "2026-12-25",
+      "importance": "high",
+      "notes": "Major retail and gifting holiday. Peak festive season.",
+      "tags": ["festive", "gifting", "retail", "family"]
+    },
+    {
+      "title": "Day of Goodwill",
+      "startDate": "2026-12-26",
+      "importance": "med",
+      "notes": "Boxing Day. Major sales day. Post-Christmas promotions.",
+      "tags": ["sales", "retail", "boxing-day"]
+    }
+  ]
+}
+

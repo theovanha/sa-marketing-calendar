@@ -1,0 +1,299 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-geist-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-geist-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --vanha-green: #00F59B;
+}
+
+@layer base {
+  * {
+    @apply border-surface-700;
+  }
+  
+  body {
+    @apply bg-black text-white antialiased;
+    font-family: var(--font-geist-sans);
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-black;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-700 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-surface-600;
+  }
+}
+
+@layer components {
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-black/90 backdrop-blur-xl border-b border-surface-800;
+  }
+  
+  /* Card styles */
+  .card {
+    @apply bg-surface-900 border border-surface-800 rounded-lg;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-200 hover:bg-surface-800 hover:border-surface-700;
+  }
+  
+  /* Event pill base styles */
+  .event-pill {
+    @apply px-2 py-1 rounded text-xs font-medium truncate cursor-pointer transition-all;
+    @apply hover:ring-1 hover:ring-white/30;
+  }
+  
+  /* Muted style for pre-populated (global) events */
+  .event-pill-muted {
+    @apply opacity-60;
+  }
+  
+  /* Public holidays - VANHA GREEN accent */
+  .event-pill-holiday-green {
+    background-color: rgba(0, 245, 155, 0.15) !important;
+    border-left: 2px solid #00F59B !important;
+  }
+  
+  .event-pill-keydate {
+    @apply bg-surface-800 border-l-2 border-surface-600;
+  }
+  
+  .event-pill-school {
+    @apply bg-violet-500/10 border-l-2 border-violet-500/50;
+  }
+  
+  .event-pill-season {
+    @apply bg-cyan-500/10 border-l-2 border-cyan-500/50;
+  }
+  
+  /* Brand events - WHITE, prominent */
+  .event-pill-brand {
+    @apply bg-white/10 text-white border-l-2 border-white;
+  }
+  
+  /* Campaign events - VANHA GREEN accent */
+  .event-pill-campaign {
+    background-color: rgba(0, 245, 155, 0.2);
+    color: #00F59B;
+    border-left: 2px solid #00F59B;
+  }
+  
+  /* Range bar for campaign flights */
+  .range-bar {
+    @apply h-1.5 rounded-full bg-gradient-to-r;
+  }
+  
+  /* Filter chip */
+  .filter-chip {
+    @apply px-3 py-1.5 rounded text-xs font-medium transition-all cursor-pointer;
+    @apply border border-surface-700 text-surface-400;
+    @apply hover:border-surface-500 hover:text-white;
+  }
+  
+  .filter-chip-active {
+    background-color: rgba(0, 245, 155, 0.2) !important;
+    border-color: #00F59B !important;
+    color: #00F59B !important;
+  }
+  
+  /* Input styles */
+  .input {
+    @apply w-full px-3 py-2 rounded bg-surface-900 border border-surface-700;
+    @apply text-white placeholder:text-surface-500;
+    @apply transition-all duration-200;
+  }
+  
+  .input:focus {
+    outline: none;
+    box-shadow: 0 0 0 1px #00F59B;
+    border-color: #00F59B;
+  }
+  
+  .input-sm {
+    @apply px-2 py-1.5 text-sm;
+  }
+  
+  /* Button styles */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded font-medium;
+    @apply transition-all duration-200 cursor-pointer;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-primary {
+    background-color: #00F59B !important;
+    color: #000000 !important;
+    @apply font-semibold;
+  }
+  
+  .btn-primary:hover {
+    background-color: #33FDB5 !important;
+  }
+  
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+  
+  .btn-secondary {
+    @apply bg-transparent text-white border border-surface-700;
+    @apply hover:bg-surface-800 hover:border-surface-600;
+  }
+  
+  .btn-ghost {
+    @apply text-surface-400 hover:text-white hover:bg-surface-800;
+  }
+  
+  .btn-danger {
+    @apply bg-red-600/20 text-red-400 border border-red-600/30;
+    @apply hover:bg-red-600/30 hover:text-red-300;
+  }
+  
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+  
+  .btn-icon {
+    @apply p-2;
+  }
+  
+  /* Drawer styles */
+  .drawer {
+    @apply fixed top-0 right-0 h-full w-full max-w-md bg-black border-l border-surface-800;
+    @apply transform transition-transform duration-300 ease-out z-50;
+    @apply shadow-2xl shadow-black/80;
+  }
+  
+  .drawer-closed {
+    @apply translate-x-full;
+  }
+  
+  .drawer-open {
+    @apply translate-x-0;
+  }
+  
+  /* Overlay */
+  .overlay {
+    @apply fixed inset-0 bg-black/80 backdrop-blur-sm z-40;
+    @apply transition-opacity duration-300;
+  }
+  
+  /* Month card */
+  .month-card {
+    @apply card p-4 min-h-[180px] flex flex-col;
+  }
+  
+  .month-card-header {
+    @apply text-sm font-semibold text-white mb-3 pb-2 border-b border-surface-800;
+  }
+  
+  /* Month notes textarea */
+  .month-notes {
+    @apply w-full text-xs bg-surface-800/50 border-0 rounded p-2;
+    @apply resize-y min-h-[100px] max-h-[300px];
+    @apply text-surface-300 placeholder:text-surface-600;
+    @apply focus:outline-none;
+  }
+  
+  .month-notes:focus {
+    box-shadow: 0 0 0 1px rgba(0, 245, 155, 0.5);
+  }
+  
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium;
+  }
+  
+  .badge-holiday {
+    background-color: rgba(0, 245, 155, 0.2);
+    color: #00F59B;
+  }
+  
+  .badge-school {
+    @apply bg-violet-500/20 text-violet-300;
+  }
+  
+  .badge-brand {
+    @apply bg-white/10 text-white;
+  }
+  
+  .badge-campaign {
+    background-color: rgba(0, 245, 155, 0.2);
+    color: #00F59B;
+  }
+}
+
+@layer components {
+  /* Selected/active state for buttons and options - VANHA green */
+  .selected-state {
+    border-color: #00F59B !important;
+    background-color: rgba(0, 245, 155, 0.1) !important;
+    color: #00F59B !important;
+  }
+  
+  .toggle-on {
+    background-color: #00F59B !important;
+  }
+  
+  .toggle-off {
+    background-color: #3f3f46 !important;
+  }
+}
+
+@layer utilities {
+  /* Animations */
+  .animate-in {
+    animation: animateIn 0.2s ease-out;
+  }
+  
+  @keyframes animateIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+  }
+  
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  
+  /* Stagger delays for lists */
+  .stagger-1 { animation-delay: 50ms; }
+  .stagger-2 { animation-delay: 100ms; }
+  .stagger-3 { animation-delay: 150ms; }
+  .stagger-4 { animation-delay: 200ms; }
+  .stagger-5 { animation-delay: 250ms; }
+  .stagger-6 { animation-delay: 300ms; }
+  
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+}

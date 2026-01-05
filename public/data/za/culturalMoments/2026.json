@@ -1,0 +1,229 @@
+{
+  "year": 2026,
+  "moments": [
+    {
+      "title": "Valentine's Day",
+      "startDate": "2026-02-14",
+      "importance": "high",
+      "notes": "Major gifting occasion. Flowers, jewelry, dining, experiences.",
+      "tags": ["romance", "gifting", "dining"],
+      "commerceRelevance": "high"
+    },
+    {
+      "title": "Mother's Day",
+      "startDate": "2026-05-10",
+      "importance": "high",
+      "notes": "Second Sunday of May in SA. Major gifting and dining occasion.",
+      "tags": ["gifting", "family", "dining", "wellness"],
+      "commerceRelevance": "high"
+    },
+    {
+      "title": "Father's Day",
+      "startDate": "2026-06-21",
+      "importance": "high",
+      "notes": "Third Sunday of June. Gifting focus on tech, experiences, apparel.",
+      "tags": ["gifting", "family", "tech", "experiences"],
+      "commerceRelevance": "high"
+    },
+    {
+      "title": "Black Friday",
+      "startDate": "2026-11-27",
+      "importance": "high",
+      "notes": "Biggest retail day of the year. Discounts across all categories.",
+      "tags": ["sales", "retail", "discounts"],
+      "commerceRelevance": "high"
+    },
+    {
+      "title": "Cyber Monday",
+      "startDate": "2026-11-30",
+      "importance": "high",
+      "notes": "Online shopping focus. Tech and e-commerce deals.",
+      "tags": ["ecommerce", "tech", "sales"],
+      "commerceRelevance": "high"
+    },
+    {
+      "title": "Easter Sunday",
+      "startDate": "2026-04-05",
+      "importance": "high",
+      "notes": "Family gatherings, chocolate and confectionery sales, travel.",
+      "tags": ["family", "confectionery", "religious"],
+      "commerceRelevance": "high"
+    },
+    {
+      "title": "Eid al-Fitr (estimated)",
+      "startDate": "2026-03-20",
+      "importance": "med",
+      "notes": "End of Ramadan. Celebration, gifting, and feasting in Muslim communities.",
+      "tags": ["religious", "community", "gifting"],
+      "commerceRelevance": "medium"
+    },
+    {
+      "title": "Diwali",
+      "startDate": "2026-11-08",
+      "importance": "med",
+      "notes": "Festival of Lights. Significant in Indian communities. Gifting, sweets, home decor.",
+      "tags": ["religious", "community", "gifting", "decor"],
+      "commerceRelevance": "medium"
+    },
+    {
+      "title": "Matric Results Day",
+      "startDate": "2026-01-19",
+      "importance": "med",
+      "notes": "Annual release of high school final exam results. Education and celebration focus.",
+      "tags": ["education", "youth", "celebration"],
+      "commerceRelevance": "medium"
+    },
+    {
+      "title": "🚴 Cape Town Cycle Tour",
+      "startDate": "2026-03-08",
+      "importance": "med",
+      "notes": "World's largest timed cycling event. 35,000+ participants. Sports and outdoor brand opportunity.",
+      "tags": ["sports", "cycling", "outdoor", "cape-town"],
+      "commerceRelevance": "medium"
+    },
+    {
+      "title": "🏃 Two Oceans Marathon",
+      "startDate": "2026-04-11",
+      "importance": "med",
+      "notes": "Ultra marathon in Cape Town. Running gear, nutrition, fitness focus.",
+      "tags": ["sports", "running", "fitness", "cape-town"],
+      "commerceRelevance": "medium"
+    },
+    {
+      "title": "🏃 Comrades Marathon",
+      "startDate": "2026-06-14",
+      "importance": "high",
+      "notes": "Iconic 90km ultramarathon between Durban and PMB. Massive national event.",
+      "tags": ["sports", "running", "fitness", "kzn"],
+      "commerceRelevance": "high"
+    },
+    {
+      "title": "🏉 Rugby Championship Starts",
+      "startDate": "2026-08-08",
+      "importance": "med",
+      "notes": "Springbok rugby season kicks off. Sports apparel, beer, snacks, entertainment.",
+      "tags": ["sports", "rugby", "entertainment"],
+      "commerceRelevance": "medium"
+    },
+    {
+      "title": "🏏 Cricket Season Starts",
+      "startDate": "2026-10-01",
+      "importance": "low",
+      "notes": "Proteas cricket season begins. Summer sport, outdoor events.",
+      "tags": ["sports", "cricket", "summer"],
+      "commerceRelevance": "low"
+    },
+    {
+      "title": "🎭 KKNK Festival",
+      "startDate": "2026-04-04",
+      "importance": "low",
+      "notes": "Klein Karoo Nasionale Kunstefees in Oudtshoorn. Major Afrikaans arts festival.",
+      "tags": ["arts", "culture", "festival", "afrikaans"],
+      "commerceRelevance": "low"
+    },
+    {
+      "title": "🎭 National Arts Festival",
+      "startDate": "2026-06-25",
+      "importance": "low",
+      "notes": "Makhanda (Grahamstown) arts festival. Africa's largest arts gathering.",
+      "tags": ["arts", "culture", "festival"],
+      "commerceRelevance": "low"
+    },
+    {
+      "title": "🍷 Cape Wine Auction",
+      "startDate": "2026-02-14",
+      "importance": "low",
+      "notes": "Premier wine charity auction. Luxury, wine tourism.",
+      "tags": ["wine", "luxury", "cape-town"],
+      "commerceRelevance": "low"
+    },
+    {
+      "title": "🦪 Knysna Oyster Festival",
+      "startDate": "2026-07-03",
+      "importance": "low",
+      "notes": "10-day festival in Knysna. Food, sport, and entertainment.",
+      "tags": ["food", "festival", "winter", "garden-route"],
+      "commerceRelevance": "low"
+    },
+    {
+      "title": "🎪 Rand Show",
+      "startDate": "2026-04-10",
+      "importance": "med",
+      "notes": "Major consumer exhibition in Johannesburg. Wide retail exposure.",
+      "tags": ["exhibition", "retail", "johannesburg"],
+      "commerceRelevance": "medium"
+    },
+    {
+      "title": "🏠 Decorex Cape Town",
+      "startDate": "2026-04-23",
+      "importance": "low",
+      "notes": "Interior design and decor exhibition.",
+      "tags": ["decor", "home", "exhibition"],
+      "commerceRelevance": "low"
+    },
+    {
+      "title": "🏠 Decorex Joburg",
+      "startDate": "2026-08-06",
+      "importance": "low",
+      "notes": "Interior design and decor exhibition.",
+      "tags": ["decor", "home", "exhibition"],
+      "commerceRelevance": "low"
+    },
+    {
+      "title": "📱 AfricaCom",
+      "startDate": "2026-11-10",
+      "importance": "low",
+      "notes": "Africa's largest tech and telecoms event in Cape Town.",
+      "tags": ["tech", "business", "conference"],
+      "commerceRelevance": "low"
+    },
+    {
+      "title": "🎵 Rocking the Daisies",
+      "startDate": "2026-10-02",
+      "importance": "low",
+      "notes": "Major music festival near Cape Town. Youth culture, outdoor.",
+      "tags": ["music", "festival", "youth"],
+      "commerceRelevance": "low"
+    },
+    {
+      "title": "🎵 Oppikoppi",
+      "startDate": "2026-08-07",
+      "importance": "low",
+      "notes": "Iconic music festival in Limpopo. Alternative, rock, camping.",
+      "tags": ["music", "festival", "camping"],
+      "commerceRelevance": "low"
+    },
+    {
+      "title": "⛳ SA Open Golf",
+      "startDate": "2026-01-08",
+      "importance": "low",
+      "notes": "Prestigious golf tournament. Luxury brands, sports.",
+      "tags": ["sports", "golf", "luxury"],
+      "commerceRelevance": "low"
+    },
+    {
+      "title": "🏇 Durban July",
+      "startDate": "2026-07-04",
+      "importance": "high",
+      "notes": "South Africa's premier horse racing event. Fashion, betting, hospitality.",
+      "tags": ["sports", "horse-racing", "fashion", "luxury", "kzn"],
+      "commerceRelevance": "high"
+    },
+    {
+      "title": "🏇 Sun Met",
+      "startDate": "2026-01-31",
+      "importance": "med",
+      "notes": "Cape Town's premier horse racing event. Fashion, summer, hospitality.",
+      "tags": ["sports", "horse-racing", "fashion", "cape-town"],
+      "commerceRelevance": "medium"
+    },
+    {
+      "title": "🎬 Loerie Awards",
+      "startDate": "2026-09-17",
+      "importance": "low",
+      "notes": "Africa's premier advertising and marketing awards.",
+      "tags": ["advertising", "marketing", "awards"],
+      "commerceRelevance": "low"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "hemisphere": "Southern",
+  "seasons": [
+    {
+      "name": "Summer",
+      "startDate": "12-01",
+      "endDate": "02-28",
+      "notes": "Peak holiday season. Beach, outdoor activities, travel. Festive period overlap."
+    },
+    {
+      "name": "Autumn",
+      "startDate": "03-01",
+      "endDate": "05-31",
+      "notes": "Harvest season. Wine tourism, outdoor activities before winter. Easter period."
+    },
+    {
+      "name": "Winter",
+      "startDate": "06-01",
+      "endDate": "08-31",
+      "notes": "Cold weather. Indoor activities, comfort food, warm apparel. School holidays in June/July."
+    },
+    {
+      "name": "Spring",
+      "startDate": "09-01",
+      "endDate": "11-30",
+      "notes": "Flower season (especially Western Cape). Outdoor activities resume. Heritage Day."
+    },
+    {
+      "name": "Festive",
+      "startDate": "12-01",
+      "endDate": "01-15",
+      "notes": "Peak retail and travel period. Christmas, New Year, summer holidays. Schools closed."
+    }
+  ]
+}
+
