@@ -8,11 +8,21 @@ import type { Brand, CalendarEvent } from './types';
 // Brand operations
 export const brandService = {
   async getAll(): Promise<Brand[]> {
+    // #region agent log H2
+    console.log('[SUPABASE_DEBUG] brandService.getAll - hasClient:', !!supabase);
+    // #endregion
+    if (!supabase) {
+      console.log('[SUPABASE_DEBUG] brandService.getAll - client is NULL, returning empty');
+      return [];
+    }
     const { data, error } = await supabase
       .from('brands')
       .select('*')
       .order('created_at', { ascending: false });
     
+    // #region agent log H4
+    console.log('[SUPABASE_DEBUG] brandService.getAll result:', { hasData: !!data, count: data?.length, error: error?.message });
+    // #endregion
     if (error) throw error;
     
     return (data || []).map(b => ({
@@ -27,6 +37,13 @@ export const brandService = {
   },
 
   async create(brand: Brand): Promise<void> {
+    // #region agent log H3
+    console.log('[SUPABASE_DEBUG] brandService.create:', { brandId: brand.id, name: brand.name, hasClient: !!supabase });
+    // #endregion
+    if (!supabase) {
+      console.log('[SUPABASE_DEBUG] brandService.create - client is NULL, skipping save');
+      return;
+    }
     const { error } = await supabase.from('brands').insert({
       id: brand.id,
       name: brand.name,
@@ -36,10 +53,14 @@ export const brandService = {
       archived: brand.archived || false,
       created_at: brand.createdAt,
     });
+    // #region agent log H5
+    console.log('[SUPABASE_DEBUG] brandService.create result:', { success: !error, error: error?.message });
+    // #endregion
     if (error) throw error;
   },
 
   async update(id: string, updates: Partial<Brand>): Promise<void> {
+    if (!supabase) return;
     const dbUpdates: Record<string, unknown> = {};
     if (updates.name !== undefined) dbUpdates.name = updates.name;
     if (updates.logo !== undefined) dbUpdates.logo = updates.logo || null;
@@ -51,6 +72,7 @@ export const brandService = {
   },
 
   async delete(id: string): Promise<void> {
+    if (!supabase) return;
     const { error } = await supabase.from('brands').delete().eq('id', id);
     if (error) throw error;
   },
@@ -59,6 +81,7 @@ export const brandService = {
 // Event operations
 export const eventService = {
   async getAll(): Promise<CalendarEvent[]> {
+    if (!supabase) return [];
     const { data, error } = await supabase
       .from('events')
       .select('*')
@@ -85,6 +108,7 @@ export const eventService = {
   },
 
   async create(event: CalendarEvent): Promise<void> {
+    if (!supabase) return;
     const { error } = await supabase.from('events').insert({
       id: event.id,
       brand_id: event.brandId,
@@ -105,6 +129,7 @@ export const eventService = {
   },
 
   async update(id: string, updates: Partial<CalendarEvent>): Promise<void> {
+    if (!supabase) return;
     const dbUpdates: Record<string, unknown> = {};
     if (updates.title !== undefined) dbUpdates.title = updates.title;
     if (updates.type !== undefined) dbUpdates.type = updates.type;
@@ -122,11 +147,13 @@ export const eventService = {
   },
 
   async delete(id: string): Promise<void> {
+    if (!supabase) return;
     const { error } = await supabase.from('events').delete().eq('id', id);
     if (error) throw error;
   },
 
   async deleteByBrandId(brandId: string): Promise<void> {
+    if (!supabase) return;
     const { error } = await supabase.from('events').delete().eq('brand_id', brandId);
     if (error) throw error;
   },
@@ -135,6 +162,7 @@ export const eventService = {
 // Hidden events operations
 export const hiddenEventService = {
   async getByBrand(brandId: string): Promise<string[]> {
+    if (!supabase) return [];
     const { data, error } = await supabase
       .from('hidden_events')
       .select('event_id')
@@ -145,6 +173,7 @@ export const hiddenEventService = {
   },
 
   async getAll(): Promise<Record<string, string[]>> {
+    if (!supabase) return {};
     const { data, error } = await supabase
       .from('hidden_events')
       .select('brand_id, event_id');
@@ -160,6 +189,7 @@ export const hiddenEventService = {
   },
 
   async hide(brandId: string, eventId: string): Promise<void> {
+    if (!supabase) return;
     const id = `${brandId}-${eventId}`;
     const { error } = await supabase.from('hidden_events').upsert({
       id,
@@ -170,6 +200,7 @@ export const hiddenEventService = {
   },
 
   async unhide(brandId: string, eventId: string): Promise<void> {
+    if (!supabase) return;
     const { error } = await supabase
       .from('hidden_events')
       .delete()
@@ -182,6 +213,7 @@ export const hiddenEventService = {
 // Month notes operations
 export const monthNoteService = {
   async getAll(): Promise<Record<string, string>> {
+    if (!supabase) return {};
     const { data, error } = await supabase
       .from('month_notes')
       .select('*');
@@ -197,6 +229,7 @@ export const monthNoteService = {
   },
 
   async set(brandId: string, year: number, month: number, note: string): Promise<void> {
+    if (!supabase) return;
     const id = `${brandId}-${year}-${month}`;
     const { error } = await supabase.from('month_notes').upsert({
       id,

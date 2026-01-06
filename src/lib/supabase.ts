@@ -1,9 +1,23 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// #region agent log H1
+console.log('[SUPABASE_DEBUG] Env vars:', { 
+  hasUrl: !!supabaseUrl, 
+  hasKey: !!supabaseAnonKey, 
+  urlPrefix: supabaseUrl?.substring(0, 30) 
+});
+// #endregion
+
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
+
+// #region agent log H2
+console.log('[SUPABASE_DEBUG] Client created:', !!supabase);
+// #endregion
 
 // Database types
 export interface DbBrand {
