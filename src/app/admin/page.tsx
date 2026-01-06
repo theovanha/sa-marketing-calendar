@@ -14,8 +14,10 @@ import {
   Sparkles,
   Sun,
   Loader2,
+  Trash2,
+  Building2,
 } from 'lucide-react';
-import { useAppStore, useGlobalEvents } from '@/lib/store';
+import { useAppStore, useGlobalEvents, useActiveBrands } from '@/lib/store';
 import { Button, Select } from '@/components/ui';
 import { loadSADataset, checkDatasetExists } from '@/lib/dataLoader';
 import {
@@ -37,8 +39,18 @@ export default function AdminPage() {
   const [loadErrors, setLoadErrors] = useState<string[]>([]);
   const [loadSuccess, setLoadSuccess] = useState(false);
 
-  const { importGlobalEvents, clearGlobalEvents } = useAppStore();
+  const { importGlobalEvents, clearGlobalEvents, deleteBrand } = useAppStore();
   const globalEvents = useGlobalEvents();
+  const brands = useActiveBrands();
+  const [deletingBrandId, setDeletingBrandId] = useState<string | null>(null);
+
+  const handleDeleteBrand = async (brandId: string, brandName: string) => {
+    if (confirm(`Are you sure you want to permanently delete "${brandName}"?\n\nThis will delete:\n• All brand events\n• All month notes\n• All hidden event preferences\n\nThis cannot be undone.`)) {
+      setDeletingBrandId(brandId);
+      await deleteBrand(brandId);
+      setDeletingBrandId(null);
+    }
+  };
 
   const yearOptions = [];
   const currentYear = new Date().getFullYear();
@@ -110,7 +122,7 @@ export default function AdminPage() {
         {/* Current state */}
         <section className="card p-6">
           <h2 className="text-lg font-semibold text-surface-200 mb-4">Current State</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="p-4 bg-surface-800 rounded-lg">
               <div className="text-2xl font-bold" style={{ color: '#00F59B' }}>{globalEvents.length}</div>
               <div className="text-sm text-surface-400">Global SA events loaded</div>
@@ -121,7 +133,67 @@ export default function AdminPage() {
               </div>
               <div className="text-sm text-surface-400">Public holidays</div>
             </div>
+            <div className="p-4 bg-surface-800 rounded-lg">
+              <div className="text-2xl font-bold text-surface-200">{brands.length}</div>
+              <div className="text-sm text-surface-400">Active brands</div>
+            </div>
           </div>
+        </section>
+
+        {/* Brand Management */}
+        <section className="card p-6">
+          <h2 className="text-lg font-semibold text-surface-200 mb-4 flex items-center gap-2">
+            <Building2 className="w-5 h-5" />
+            Brand Management
+          </h2>
+          
+          {brands.length === 0 ? (
+            <p className="text-sm text-surface-500">No brands created yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {brands.map((brand) => (
+                <div
+                  key={brand.id}
+                  className="flex items-center justify-between p-3 bg-surface-800 rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-8 h-8 rounded flex items-center justify-center text-sm font-bold"
+                      style={{ backgroundColor: brand.primaryColor }}
+                    >
+                      {brand.logo ? (
+                        <img src={brand.logo} alt="" className="w-full h-full object-cover rounded" />
+                      ) : (
+                        <span className="text-white">{brand.name.charAt(0).toUpperCase()}</span>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-surface-200">{brand.name}</p>
+                      <p className="text-xs text-surface-500">ID: {brand.id}</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteBrand(brand.id, brand.name)}
+                    disabled={deletingBrandId === brand.id}
+                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                  >
+                    {deletingBrandId === brand.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-4 h-4" />
+                    )}
+                    Delete
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          <p className="text-xs text-surface-500 mt-4">
+            ⚠️ Deleting a brand permanently removes all its events, notes, and settings from the database.
+          </p>
         </section>
 
         {/* Load dataset */}
