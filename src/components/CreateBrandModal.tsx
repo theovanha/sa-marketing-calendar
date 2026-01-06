@@ -15,11 +15,11 @@ export function CreateBrandModal({ open, onClose }: CreateBrandModalProps) {
   const [name, setName] = useState('');
   const { createBrand, selectBrand } = useAppStore();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
-    const brand = createBrand(name.trim());
+    const brand = await createBrand(name.trim());
     selectBrand(brand.id);
     setName('');
     onClose();
