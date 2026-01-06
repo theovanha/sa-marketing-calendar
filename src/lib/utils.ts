@@ -76,8 +76,9 @@ export function sortEvents(events: CalendarEvent[]): CalendarEvent[] {
     schoolTerm: 2,
     brandMoment: 3,
     campaignFlight: 4,
-    culture: 5,
-    season: 6,
+    keyDate: 5,
+    culture: 6,
+    season: 7,
   };
   
   return [...events].sort((a, b) => {
