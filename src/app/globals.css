@@ -86,11 +86,11 @@
     @apply bg-white/10 text-white border-l-2 border-white;
   }
   
-  /* Campaign events - VANHA GREEN accent */
+  /* Campaign events - YELLOW accent */
   .event-pill-campaign {
-    background-color: rgba(0, 245, 155, 0.2);
-    color: #00F59B;
-    border-left: 2px solid #00F59B;
+    background-color: rgba(250, 204, 21, 0.15);
+    color: #FACC15;
+    border-left: 2px solid #FACC15;
   }
   
   /* Range bar for campaign flights */
@@ -232,8 +232,8 @@
   }
   
   .badge-campaign {
-    background-color: rgba(0, 245, 155, 0.2);
-    color: #00F59B;
+    background-color: rgba(250, 204, 21, 0.15);
+    color: #FACC15;
   }
 }
 

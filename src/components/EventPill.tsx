@@ -69,18 +69,23 @@ export function EventPill({ event, compact = false }: EventPillProps) {
   const isRange = event.endDate && event.endDate !== event.startDate;
   
   // Styling rules based on event type:
-  // - Brand and Campaign = white (highlighted)
+  // - Brand = white (highlighted)
+  // - Campaign = yellow (highlighted)
   // - Key Date, School, Season, Public Holiday, Culture = gray
-  const isHighlightedType = event.type === 'brandMoment' || event.type === 'campaignFlight';
+  const isBrandMoment = event.type === 'brandMoment';
+  const isCampaign = event.type === 'campaignFlight';
+  const isHighlightedType = isBrandMoment || isCampaign;
   const isPublicHoliday = event.type === 'publicHoliday';
   const isGlobalEvent = event.brandId === null;
   
-  // VANHA green for public holidays, white for highlighted types, gray for others
+  // VANHA green for public holidays, yellow for campaigns, white for brand, gray for others
   const textColor = isPublicHoliday 
     ? '#00F59B'  // VANHA green for public holidays
-    : isHighlightedType
-      ? '#ffffff'  // White for Brand and Campaign
-      : '#a1a1aa'; // Gray for Key Date, School, Season, etc.
+    : isCampaign
+      ? '#FACC15'  // Yellow for campaigns
+      : isBrandMoment
+        ? '#ffffff'  // White for Brand
+        : '#a1a1aa'; // Gray for Key Date, School, Season, etc.
 
   // Format date with day abbreviation: "5 Fri"
   const formatDayWithWeekday = (dateStr: string) => {
