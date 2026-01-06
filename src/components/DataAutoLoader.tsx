@@ -5,17 +5,31 @@ import { useAppStore, useGlobalEvents } from '@/lib/store';
 import { loadSADataset } from '@/lib/dataLoader';
 
 /**
- * Auto-loads SA dataset (public holidays, school terms, cultural moments, seasons)
- * on app startup. Runs once per session.
+ * Auto-loads SA dataset and syncs with Supabase on app startup.
  */
 export function DataAutoLoader() {
-  const { importGlobalEvents, selectedYear } = useAppStore();
+  const { 
+    importGlobalEvents, 
+    selectedYear, 
+    initializeFromSupabase,
+    isInitialized 
+  } = useAppStore();
   const globalEvents = useGlobalEvents();
-  const hasLoaded = useRef(false);
+  const hasLoadedSAData = useRef(false);
+  const hasInitializedSupabase = useRef(false);
 
+  // Initialize from Supabase on mount
   useEffect(() => {
-    // Only load once per session, and only if no global events exist
-    if (hasLoaded.current) return;
+    if (hasInitializedSupabase.current) return;
+    hasInitializedSupabase.current = true;
+    
+    initializeFromSupabase().catch(console.error);
+  }, [initializeFromSupabase]);
+
+  // Load SA dataset after Supabase init
+  useEffect(() => {
+    if (!isInitialized) return;
+    if (hasLoadedSAData.current) return;
     
     // Check if we already have global events for the current year
     const hasEventsForYear = globalEvents.some((e) => 
@@ -23,13 +37,13 @@ export function DataAutoLoader() {
     );
     
     if (hasEventsForYear) {
-      hasLoaded.current = true;
+      hasLoadedSAData.current = true;
       return;
     }
 
     // Load SA dataset
     const loadData = async () => {
-      hasLoaded.current = true;
+      hasLoadedSAData.current = true;
       
       // Load current year
       const { events: currentYearEvents } = await loadSADataset(selectedYear);
@@ -50,11 +64,8 @@ export function DataAutoLoader() {
     };
 
     loadData();
-  }, [selectedYear, globalEvents, importGlobalEvents]);
+  }, [isInitialized, selectedYear, globalEvents, importGlobalEvents]);
 
   // This component doesn't render anything
   return null;
 }
-
-
-

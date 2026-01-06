@@ -3,22 +3,35 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Brand, CalendarEvent, FilterState } from './types';
-import { generateId, getNextBrandColor } from './utils';
+import { generateId } from './utils';
+import { 
+  brandService, 
+  eventService, 
+  hiddenEventService, 
+  monthNoteService,
+  loadAllData 
+} from './supabaseService';
 
 // ============================================
 // App Store - Brands, Events, UI State
+// With Supabase Sync
 // ============================================
 
 interface AppState {
   // Data
   brands: Brand[];
   events: CalendarEvent[];
-  monthNotes: Record<string, string>; // Key: "brandId-year-month", Value: note text
-  hiddenEventsByBrand: Record<string, string[]>; // Key: brandId, Value: array of hidden event IDs
+  monthNotes: Record<string, string>;
+  hiddenEventsByBrand: Record<string, string[]>;
   
-  // Undo stack (stores recently deleted events)
+  // Sync state
+  isLoading: boolean;
+  isInitialized: boolean;
+  syncError: string | null;
+  
+  // Undo stack
   deletedEvents: CalendarEvent[];
-  lastHiddenEventBrandId: string | null; // Track which brand the last hidden event was for
+  lastHiddenEventBrandId: string | null;
   showUndoToast: boolean;
   
   // UI State
@@ -30,24 +43,27 @@ interface AppState {
   searchQuery: string;
   filters: FilterState;
   
+  // Initialization
+  initializeFromSupabase: () => Promise<void>;
+  
   // Brand Actions
-  createBrand: (name: string) => Brand;
-  updateBrand: (id: string, updates: Partial<Brand>) => void;
-  archiveBrand: (id: string) => void;
-  deleteBrand: (id: string) => void;
+  createBrand: (name: string) => Promise<Brand>;
+  updateBrand: (id: string, updates: Partial<Brand>) => Promise<void>;
+  archiveBrand: (id: string) => Promise<void>;
+  deleteBrand: (id: string) => Promise<void>;
   selectBrand: (id: string | null) => void;
   
   // Event Actions
-  createEvent: (event: Omit<CalendarEvent, 'id'>) => CalendarEvent;
-  updateEvent: (id: string, updates: Partial<CalendarEvent>) => void;
-  deleteEvent: (id: string) => void;
-  hideEventForBrand: (eventId: string, brandId: string) => void;
-  unhideEventForBrand: (eventId: string, brandId: string) => void;
+  createEvent: (event: Omit<CalendarEvent, 'id'>) => Promise<CalendarEvent>;
+  updateEvent: (id: string, updates: Partial<CalendarEvent>) => Promise<void>;
+  deleteEvent: (id: string) => Promise<void>;
+  hideEventForBrand: (eventId: string, brandId: string) => Promise<void>;
+  unhideEventForBrand: (eventId: string, brandId: string) => Promise<void>;
   isEventHiddenForBrand: (eventId: string, brandId: string) => boolean;
   selectEvent: (id: string | null) => void;
   
   // Undo Actions
-  undoDelete: () => void;
+  undoDelete: () => Promise<void>;
   dismissUndoToast: () => void;
   
   // Bulk event operations (for dataset import)
@@ -63,16 +79,16 @@ interface AppState {
   resetFilters: () => void;
   
   // Month notes
-  setMonthNote: (brandId: string | null, year: number, month: number, note: string) => void;
+  setMonthNote: (brandId: string | null, year: number, month: number, note: string) => Promise<void>;
   getMonthNote: (brandId: string | null, year: number, month: number) => string;
 }
 
 const DEFAULT_FILTERS: FilterState = {
-  keyDates: true,        // Public holidays + cultural moments
-  school: true,          // School terms + back-to-school
-  seasons: true,         // Seasonal markers
-  brandDates: true,      // User brand moments
-  campaignFlights: true, // User campaigns
+  keyDates: true,
+  school: true,
+  seasons: true,
+  brandDates: true,
+  campaignFlights: true,
 };
 
 export const useAppStore = create<AppState>()(
@@ -83,6 +99,9 @@ export const useAppStore = create<AppState>()(
       events: [],
       monthNotes: {},
       hiddenEventsByBrand: {},
+      isLoading: false,
+      isInitialized: false,
+      syncError: null,
       deletedEvents: [],
       lastHiddenEventBrandId: null,
       showUndoToast: false,
@@ -94,44 +113,109 @@ export const useAppStore = create<AppState>()(
       searchQuery: '',
       filters: DEFAULT_FILTERS,
       
+      // Initialize from Supabase
+      initializeFromSupabase: async () => {
+        if (get().isInitialized) return;
+        
+        set({ isLoading: true, syncError: null });
+        
+        try {
+          const data = await loadAllData();
+          
+          // Merge Supabase data with local events (keep global SA events from local)
+          const localGlobalEvents = get().events.filter(e => e.brandId === null);
+          const supabaseGlobalEvents = data.events.filter(e => e.brandId === null);
+          const supabaseBrandEvents = data.events.filter(e => e.brandId !== null);
+          
+          // Use Supabase global events if they exist, otherwise keep local
+          const globalEvents = supabaseGlobalEvents.length > 0 
+            ? supabaseGlobalEvents 
+            : localGlobalEvents;
+          
+          set({
+            brands: data.brands,
+            events: [...globalEvents, ...supabaseBrandEvents],
+            hiddenEventsByBrand: data.hiddenEventsByBrand,
+            monthNotes: data.monthNotes,
+            isLoading: false,
+            isInitialized: true,
+          });
+        } catch (error) {
+          console.error('Failed to load from Supabase:', error);
+          set({ 
+            isLoading: false, 
+            isInitialized: true,
+            syncError: 'Failed to connect to database. Using local data.' 
+          });
+        }
+      },
+      
       // Brand Actions
-      createBrand: (name: string) => {
+      createBrand: async (name: string) => {
         const newBrand: Brand = {
           id: generateId(),
           name,
-          primaryColor: '#6b7280', // Always default to grey
+          primaryColor: '#6b7280',
           timezone: 'Africa/Johannesburg',
           createdAt: new Date().toISOString(),
         };
+        
+        // Update local state immediately
         set((state) => ({
           brands: [...state.brands, newBrand],
         }));
+        
+        // Sync to Supabase
+        try {
+          await brandService.create(newBrand);
+        } catch (error) {
+          console.error('Failed to sync brand to Supabase:', error);
+        }
+        
         return newBrand;
       },
       
-      updateBrand: (id, updates) => {
+      updateBrand: async (id, updates) => {
         set((state) => ({
           brands: state.brands.map((brand) =>
             brand.id === id ? { ...brand, ...updates } : brand
           ),
         }));
+        
+        try {
+          await brandService.update(id, updates);
+        } catch (error) {
+          console.error('Failed to sync brand update to Supabase:', error);
+        }
       },
       
-      archiveBrand: (id) => {
+      archiveBrand: async (id) => {
         set((state) => ({
           brands: state.brands.map((brand) =>
             brand.id === id ? { ...brand, archived: true } : brand
           ),
           selectedBrandId: state.selectedBrandId === id ? null : state.selectedBrandId,
         }));
+        
+        try {
+          await brandService.update(id, { archived: true });
+        } catch (error) {
+          console.error('Failed to sync brand archive to Supabase:', error);
+        }
       },
       
-      deleteBrand: (id) => {
+      deleteBrand: async (id) => {
         set((state) => ({
           brands: state.brands.filter((brand) => brand.id !== id),
           events: state.events.filter((event) => event.brandId !== id),
           selectedBrandId: state.selectedBrandId === id ? null : state.selectedBrandId,
         }));
+        
+        try {
+          await brandService.delete(id);
+        } catch (error) {
+          console.error('Failed to sync brand deletion to Supabase:', error);
+        }
       },
       
       selectBrand: (id) => {
@@ -139,39 +223,61 @@ export const useAppStore = create<AppState>()(
       },
       
       // Event Actions
-      createEvent: (eventData) => {
+      createEvent: async (eventData) => {
         const newEvent: CalendarEvent = {
           ...eventData,
           id: generateId(),
         };
+        
         set((state) => ({
           events: [...state.events, newEvent],
         }));
+        
+        // Only sync brand events to Supabase (not global SA events)
+        if (newEvent.brandId !== null) {
+          try {
+            await eventService.create(newEvent);
+          } catch (error) {
+            console.error('Failed to sync event to Supabase:', error);
+          }
+        }
+        
         return newEvent;
       },
       
-      updateEvent: (id, updates) => {
+      updateEvent: async (id, updates) => {
+        const event = get().events.find(e => e.id === id);
+        
         set((state) => ({
           events: state.events.map((event) =>
             event.id === id ? { ...event, ...updates } : event
           ),
         }));
+        
+        // Only sync brand events to Supabase
+        if (event && event.brandId !== null) {
+          try {
+            await eventService.update(id, updates);
+          } catch (error) {
+            console.error('Failed to sync event update to Supabase:', error);
+          }
+        }
       },
       
-      deleteEvent: (id) => {
+      deleteEvent: async (id) => {
         const eventToDelete = get().events.find((e) => e.id === id);
         const currentBrandId = get().selectedBrandId;
         
-        // If it's a global event (brandId is null), hide it for this brand instead of deleting
         if (eventToDelete && eventToDelete.brandId === null && currentBrandId) {
-          get().hideEventForBrand(id, currentBrandId);
+          // Global event - hide it for this brand
+          await get().hideEventForBrand(id, currentBrandId);
           set((state) => ({
             deletedEvents: [eventToDelete, ...state.deletedEvents].slice(0, 10),
             lastHiddenEventBrandId: currentBrandId,
             showUndoToast: true,
           }));
         } else {
-          // It's a brand-specific event, actually delete it
+          // Brand-specific event - actually delete it
           set((state) => ({
             events: state.events.filter((event) => event.id !== id),
             selectedEventId: state.selectedEventId === id ? null : state.selectedEventId,
@@ -181,9 +287,16 @@ export const useAppStore = create<AppState>()(
             lastHiddenEventBrandId: null,
             showUndoToast: !!eventToDelete,
           }));
+          
+          if (eventToDelete && eventToDelete.brandId !== null) {
+            try {
+              await eventService.delete(id);
+            } catch (error) {
+              console.error('Failed to sync event deletion to Supabase:', error);
+            }
+          }
         }
         
-        // Auto-hide toast after 5 seconds
         if (eventToDelete) {
           setTimeout(() => {
             set({ showUndoToast: false });
@@ -191,7 +304,7 @@ export const useAppStore = create<AppState>()(
         }
       },
       
-      hideEventForBrand: (eventId, brandId) => {
+      hideEventForBrand: async (eventId, brandId) => {
         set((state) => {
           const currentHidden = state.hiddenEventsByBrand[brandId] || [];
           if (currentHidden.includes(eventId)) return state;
@@ -202,9 +315,15 @@ export const useAppStore = create<AppState>()(
             },
           };
         });
+        
+        try {
+          await hiddenEventService.hide(brandId, eventId);
+        } catch (error) {
+          console.error('Failed to sync hidden event to Supabase:', error);
+        }
       },
       
-      unhideEventForBrand: (eventId, brandId) => {
+      unhideEventForBrand: async (eventId, brandId) => {
         set((state) => {
           const currentHidden = state.hiddenEventsByBrand[brandId] || [];
           return {
@@ -214,6 +333,12 @@ export const useAppStore = create<AppState>()(
             },
           };
         });
+        
+        try {
+          await hiddenEventService.unhide(brandId, eventId);
+        } catch (error) {
+          console.error('Failed to sync unhidden event to Supabase:', error);
+        }
       },
       
       isEventHiddenForBrand: (eventId, brandId) => {
@@ -226,27 +351,33 @@ export const useAppStore = create<AppState>()(
       },
       
       // Undo Actions
-      undoDelete: () => {
+      undoDelete: async () => {
         const [lastDeleted, ...rest] = get().deletedEvents;
         const lastHiddenBrandId = get().lastHiddenEventBrandId;
         
         if (lastDeleted) {
-          // If this was a hidden global event, unhide it
           if (lastDeleted.brandId === null && lastHiddenBrandId) {
-            get().unhideEventForBrand(lastDeleted.id, lastHiddenBrandId);
+            await get().unhideEventForBrand(lastDeleted.id, lastHiddenBrandId);
             set({
               deletedEvents: rest,
               lastHiddenEventBrandId: null,
               showUndoToast: false,
             });
           } else {
-            // It was an actual deletion, restore the event
             set((state) => ({
               events: [...state.events, lastDeleted],
               deletedEvents: rest,
               lastHiddenEventBrandId: null,
               showUndoToast: false,
             }));
+            
+            if (lastDeleted.brandId !== null) {
+              try {
+                await eventService.create(lastDeleted);
+              } catch (error) {
+                console.error('Failed to restore event to Supabase:', error);
+              }
+            }
           }
         }
       },
@@ -255,10 +386,9 @@ export const useAppStore = create<AppState>()(
         set({ showUndoToast: false });
       },
       
-      // Bulk event operations
+      // Bulk event operations (local only - for global SA data)
       importGlobalEvents: (newEvents) => {
         set((state) => {
-          // Remove existing global events and add new ones
           const brandEvents = state.events.filter((e) => e.brandId !== null);
           return {
             events: [...brandEvents, ...newEvents],
@@ -307,7 +437,7 @@ export const useAppStore = create<AppState>()(
       },
       
       // Month notes
-      setMonthNote: (brandId, year, month, note) => {
+      setMonthNote: async (brandId, year, month, note) => {
         const key = `${brandId || 'global'}-${year}-${month}`;
         set((state) => ({
           monthNotes: {
@@ -315,6 +445,14 @@ export const useAppStore = create<AppState>()(
             [key]: note,
           },
         }));
+        
+        if (brandId) {
+          try {
+            await monthNoteService.set(brandId, year, month, note);
+          } catch (error) {
+            console.error('Failed to sync month note to Supabase:', error);
+          }
+        }
       },
       
       getMonthNote: (brandId, year, month) => {
@@ -359,9 +497,7 @@ export const useBrandEvents = (brandId: string | null) => {
   const hiddenIds = brandId ? (hiddenEventsByBrand[brandId] || []) : [];
   
   return events.filter((e) => {
-    // Include brand-specific events for this brand
     if (e.brandId === brandId) return true;
-    // Include global events that aren't hidden for this brand
     if (e.brandId === null && !hiddenIds.includes(e.id)) return true;
     return false;
   });
