@@ -1,43 +1,57 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { Settings, Share2, Check } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { Settings } from 'lucide-react';
 import { useAppStore, useSelectedBrand } from '@/lib/store';
-import { TopBar } from '@/components/TopBar';
+import { ClientTopBar } from '@/components/ClientTopBar';
 import { YearGrid } from '@/components/YearGrid';
 import { BrandSettingsModal } from '@/components/BrandSettingsModal';
-import { Button } from '@/components/ui';
 
-export default function BrandCalendarPage() {
+export default function ClientCalendarPage() {
   const params = useParams();
-  const router = useRouter();
   const brandId = params.id as string;
   const [showSettings, setShowSettings] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
-  const { selectBrand, brands } = useAppStore();
-
-  const handleShareWithClient = async () => {
-    const clientUrl = `${window.location.origin}/client/${brandId}`;
-    await navigator.clipboard.writeText(clientUrl);
-    setLinkCopied(true);
-    setTimeout(() => setLinkCopied(false), 2000);
-  };
+  const { selectBrand, brands, isInitialized } = useAppStore();
   const selectedBrand = useSelectedBrand();
 
   // Select the brand from URL on mount
   useEffect(() => {
+    if (!isInitialized) return;
+    
     if (brandId) {
       const brand = brands.find((b) => b.id === brandId);
       if (brand) {
         selectBrand(brandId);
+        setNotFound(false);
       } else {
-        // Brand not found, redirect to dashboard
-        router.push('/dashboard');
+        setNotFound(true);
       }
     }
-  }, [brandId, brands, selectBrand, router]);
+  }, [brandId, brands, selectBrand, isInitialized]);
+
+  // Show loading while initializing
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-surface-500">Loading calendar...</div>
+      </div>
+    );
+  }
+
+  // Show not found message if brand doesn't exist
+  if (notFound) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white mb-2">Calendar Not Found</h1>
+          <p className="text-surface-500">This calendar link may be invalid or expired.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!selectedBrand) {
     return (
@@ -49,7 +63,11 @@ export default function BrandCalendarPage() {
 
   return (
     <div className="min-h-screen">
-      <TopBar />
+      <ClientTopBar 
+        brandName={selectedBrand.name}
+        brandLogo={selectedBrand.logo}
+        brandColor={selectedBrand.primaryColor}
+      />
 
       <main className="max-w-7xl mx-auto px-6 py-6">
         {/* Brand header */}
@@ -79,24 +97,6 @@ export default function BrandCalendarPage() {
               {useAppStore.getState().selectedYear} Marketing Calendar
             </p>
           </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleShareWithClient}
-            className="flex items-center gap-2"
-          >
-            {linkCopied ? (
-              <>
-                <Check className="w-4 h-4" style={{ color: '#00F59B' }} />
-                <span style={{ color: '#00F59B' }}>Link Copied!</span>
-              </>
-            ) : (
-              <>
-                <Share2 className="w-4 h-4" />
-                <span>Share with Client</span>
-              </>
-            )}
-          </Button>
           <button
             onClick={() => setShowSettings(true)}
             className="p-2 text-surface-400 hover:text-white hover:bg-surface-800 rounded transition-colors"
