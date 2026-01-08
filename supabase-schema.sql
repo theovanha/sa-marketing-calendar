@@ -72,3 +72,4 @@ CREATE POLICY "Allow all access to events" ON events FOR ALL USING (true) WITH C
 CREATE POLICY "Allow all access to hidden_events" ON hidden_events FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all access to month_notes" ON month_notes FOR ALL USING (true) WITH CHECK (true);
 
+

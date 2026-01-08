@@ -5,7 +5,8 @@ import { CalendarEvent, EventType } from '@/lib/types';
 import { MONTH_NAMES_SHORT, MONTH_NAMES, cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { EventPill, RangeBar } from './EventPill';
-import { ChevronDown, ChevronUp, Plus } from 'lucide-react';
+import { DailyViewModal } from './DailyViewModal';
+import { ChevronDown, ChevronUp, Plus, CalendarDays } from 'lucide-react';
 
 // Event type options for the inline add form
 const EVENT_TYPE_OPTIONS: { value: EventType; label: string; highlighted: boolean }[] = [
@@ -31,6 +32,7 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
   const [isExpanded, setIsExpanded] = useState(false);
   const [noteValue, setNoteValue] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showDailyView, setShowDailyView] = useState(false);
   const [newEventTitle, setNewEventTitle] = useState('');
   const [newEventDay, setNewEventDay] = useState('1');
   const [newEventType, setNewEventType] = useState<EventType>('brandMoment');
@@ -129,7 +131,16 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
       style={isCurrentMonth ? { boxShadow: '0 0 0 1px rgba(0, 245, 155, 0.5)' } : undefined}
     >
       <div className="month-card-header flex items-center justify-between">
-        <span>{monthName}</span>
+        <div className="flex items-center gap-2">
+          <span>{monthName}</span>
+          <button
+            onClick={() => setShowDailyView(true)}
+            className="p-1 rounded hover:bg-surface-700 text-surface-500 hover:text-white transition-colors"
+            title="View daily calendar"
+          >
+            <CalendarDays className="w-3.5 h-3.5" />
+          </button>
+        </div>
         {events.length > 0 && (
           <span className="text-xs text-surface-500 font-normal">
             {events.length} event{events.length !== 1 ? 's' : ''}
@@ -290,6 +301,16 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
           className="month-notes"
         />
       </div>
+
+      {/* Daily View Modal */}
+      {showDailyView && (
+        <DailyViewModal
+          month={month}
+          year={year}
+          events={events}
+          onClose={() => setShowDailyView(false)}
+        />
+      )}
     </div>
   );
 }
