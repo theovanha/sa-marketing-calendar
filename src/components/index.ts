@@ -4,7 +4,7 @@ export { CreateBrandModal } from './CreateBrandModal';
 export { DataAutoLoader } from './DataAutoLoader';
 export { DebugPanel } from './DebugPanel';
 export { EventDrawer } from './EventDrawer';
-export { EventPill, RangeBar } from './EventPill';
+export { EventPill } from './EventPill';
 export { MonthCard } from './MonthCard';
 export { TopBar } from './TopBar';
 export { UndoToast } from './UndoToast';
