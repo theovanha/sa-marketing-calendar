@@ -72,13 +72,14 @@ export function getEventsForMonth(
 export function sortEvents(events: CalendarEvent[]): CalendarEvent[] {
   const priorities: Record<EventType, number> = {
     publicHoliday: 0,
-    backToSchool: 1,
-    schoolTerm: 2,
-    brandMoment: 3,
-    campaignFlight: 4,
-    keyDate: 5,
-    culture: 6,
-    season: 7,
+    deadline: 1,
+    backToSchool: 2,
+    schoolTerm: 3,
+    brandMoment: 4,
+    campaignFlight: 5,
+    keyDate: 6,
+    culture: 7,
+    season: 8,
   };
   
   return [...events].sort((a, b) => {
@@ -151,6 +152,7 @@ export function filterEvents(
     seasons: boolean;        // Seasonal markers
     brandDates: boolean;     // User brand moments
     campaignFlights: boolean; // User campaigns
+    deadlines: boolean;      // User deadlines
   }
 ): CalendarEvent[] {
   return events.filter((event) => {
@@ -167,11 +169,29 @@ export function filterEvents(
         return filters.brandDates;
       case 'campaignFlight':
         return filters.campaignFlights;
+      case 'deadline':
+        return filters.deadlines;
+      case 'keyDate':
+        return filters.keyDates; // Key dates follow keyDates filter
       default:
         return true;
     }
   });
 }
+
+// Color palette for deadline events
+export const DEADLINE_COLORS = [
+  '#ef4444', // red
+  '#f97316', // orange
+  '#eab308', // yellow
+  '#22c55e', // green
+  '#06b6d4', // cyan
+  '#3b82f6', // blue
+  '#8b5cf6', // violet
+  '#ec4899', // pink
+  '#f43f5e', // rose
+  '#00F59B', // VANHA green
+];
 
 // Search events by title, tags, and notes
 export function searchEvents(events: CalendarEvent[], query: string): CalendarEvent[] {

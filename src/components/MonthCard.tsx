@@ -2,19 +2,20 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { CalendarEvent, EventType } from '@/lib/types';
-import { MONTH_NAMES_SHORT, MONTH_NAMES, cn } from '@/lib/utils';
+import { MONTH_NAMES_SHORT, MONTH_NAMES, DEADLINE_COLORS, cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
 import { EventPill, RangeBar } from './EventPill';
 import { DailyViewModal } from './DailyViewModal';
 import { ChevronDown, ChevronUp, Plus, CalendarDays } from 'lucide-react';
 
 // Event type options for the inline add form
-const EVENT_TYPE_OPTIONS: { value: EventType; label: string; highlighted: boolean }[] = [
+const EVENT_TYPE_OPTIONS: { value: EventType; label: string; highlighted: boolean; hasColor?: boolean }[] = [
   { value: 'keyDate', label: 'Key Date', highlighted: false },
   { value: 'schoolTerm', label: 'School', highlighted: false },
   { value: 'season', label: 'Season', highlighted: false },
   { value: 'brandMoment', label: 'Brand', highlighted: true },
   { value: 'campaignFlight', label: 'Campaign', highlighted: true },
+  { value: 'deadline', label: 'Deadline', highlighted: false, hasColor: true },
 ];
 
 interface MonthCardProps {
@@ -35,9 +36,15 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
   const [showDailyView, setShowDailyView] = useState(false);
   const [newEventTitle, setNewEventTitle] = useState('');
   const [newEventDay, setNewEventDay] = useState('1');
+  const [newEventEndDay, setNewEventEndDay] = useState('');
   const [newEventType, setNewEventType] = useState<EventType>('brandMoment');
+  const [deadlineColor, setDeadlineColor] = useState(DEADLINE_COLORS[0]);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Check if event type supports multi-day
+  const supportsMultiDay = (type: EventType) => 
+    type === 'brandMoment' || type === 'campaignFlight' || type === 'deadline';
   
   // Load note on mount and when brand/year/month changes
   useEffect(() => {
@@ -81,20 +88,33 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
     const day = parseInt(newEventDay) || 1;
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     
+    // Calculate end date if multi-day
+    let endDateStr: string | undefined;
+    if (newEventEndDay && supportsMultiDay(newEventType)) {
+      const endDay = parseInt(newEventEndDay);
+      if (endDay > day) {
+        endDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(endDay).padStart(2, '0')}`;
+      }
+    }
+    
     createEvent({
       brandId: selectedBrandId,
       title: newEventTitle.trim(),
       type: newEventType,
       startDate: dateStr,
+      endDate: endDateStr,
       tags: [],
       importance: 'med',
       visibility: 'client',
+      customColor: newEventType === 'deadline' ? deadlineColor : undefined,
     });
     
     // Reset form
     setNewEventTitle('');
     setNewEventDay('1');
+    setNewEventEndDay('');
     setNewEventType('brandMoment');
+    setDeadlineColor(DEADLINE_COLORS[0]);
     setShowAddForm(false);
   };
   
@@ -110,12 +130,15 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
   // Get days in month for the date picker
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   
-  // Separate single-day events from range events (campaigns)
+  // Event types that support multi-day ranges
+  const multiDayTypes: EventType[] = ['brandMoment', 'campaignFlight', 'deadline'];
+  
+  // Separate single-day events from range events
   const singleEvents = events.filter(
-    (e) => !e.endDate || e.endDate === e.startDate || e.type !== 'campaignFlight'
+    (e) => !e.endDate || e.endDate === e.startDate || !multiDayTypes.includes(e.type)
   );
   const rangeEvents = events.filter(
-    (e) => e.endDate && e.endDate !== e.startDate && e.type === 'campaignFlight'
+    (e) => e.endDate && e.endDate !== e.startDate && multiDayTypes.includes(e.type)
   );
 
   const visibleEvents = isExpanded ? singleEvents : singleEvents.slice(0, maxVisible);
@@ -226,16 +249,40 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
                     newEventType === option.value
                       ? option.highlighted
                         ? 'bg-white text-black'
-                        : 'bg-surface-600 text-white'
+                        : option.value === 'deadline'
+                          ? 'text-white'
+                          : 'bg-surface-600 text-white'
                       : 'bg-surface-800 text-surface-500 hover:text-surface-300'
                   )}
+                  style={
+                    newEventType === option.value && option.value === 'deadline'
+                      ? { backgroundColor: deadlineColor }
+                      : undefined
+                  }
                 >
                   {option.label}
                 </button>
               ))}
             </div>
             
-            {/* Event name and day */}
+            {/* Color picker for deadline */}
+            {newEventType === 'deadline' && (
+              <div className="flex flex-wrap gap-1">
+                {DEADLINE_COLORS.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => setDeadlineColor(color)}
+                    className={cn(
+                      'w-5 h-5 rounded transition-all',
+                      deadlineColor === color && 'ring-2 ring-white ring-offset-1 ring-offset-surface-900'
+                    )}
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+            )}
+            
+            {/* Event name and day(s) */}
             <div className="flex gap-2">
               <input
                 ref={inputRef}
@@ -248,8 +295,15 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
               />
               <select
                 value={newEventDay}
-                onChange={(e) => setNewEventDay(e.target.value)}
-                className="w-16 text-xs bg-surface-800 border border-surface-700 rounded px-1 py-1.5 text-white focus:outline-none focus:border-[#00F59B]"
+                onChange={(e) => {
+                  setNewEventDay(e.target.value);
+                  // Reset end day if start day changes
+                  if (newEventEndDay && parseInt(e.target.value) >= parseInt(newEventEndDay)) {
+                    setNewEventEndDay('');
+                  }
+                }}
+                className="w-14 text-xs bg-surface-800 border border-surface-700 rounded px-1 py-1.5 text-white focus:outline-none focus:border-[#00F59B]"
+                title="Start day"
               >
                 {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => (
                   <option key={day} value={day}>
@@ -257,6 +311,26 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
                   </option>
                 ))}
               </select>
+              {supportsMultiDay(newEventType) && (
+                <>
+                  <span className="text-surface-500 text-xs self-center">–</span>
+                  <select
+                    value={newEventEndDay}
+                    onChange={(e) => setNewEventEndDay(e.target.value)}
+                    className="w-14 text-xs bg-surface-800 border border-surface-700 rounded px-1 py-1.5 text-white focus:outline-none focus:border-[#00F59B]"
+                    title="End day (optional)"
+                  >
+                    <option value="">—</option>
+                    {Array.from({ length: daysInMonth }, (_, i) => i + 1)
+                      .filter(day => day > parseInt(newEventDay))
+                      .map((day) => (
+                        <option key={day} value={day}>
+                          {day}
+                        </option>
+                      ))}
+                  </select>
+                </>
+              )}
             </div>
             
             {/* Action buttons */}

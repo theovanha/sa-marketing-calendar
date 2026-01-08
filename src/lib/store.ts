@@ -89,6 +89,7 @@ const DEFAULT_FILTERS: FilterState = {
   seasons: true,
   brandDates: true,
   campaignFlights: true,
+  deadlines: true,
 };
 
 export const useAppStore = create<AppState>()(

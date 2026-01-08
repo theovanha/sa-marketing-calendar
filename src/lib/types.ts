@@ -10,7 +10,8 @@ export type EventType =
   | 'culture'
   | 'brandMoment'
   | 'campaignFlight'
-  | 'keyDate'; // User-added key dates (gray styling)
+  | 'keyDate' // User-added key dates (gray styling)
+  | 'deadline'; // Deadline with custom color
 
 export type Importance = 'high' | 'med' | 'low';
 
@@ -44,6 +45,7 @@ export interface CalendarEvent {
   notes?: string; // markdown
   links?: EventLink[];
   recurrence?: Recurrence; // for brand moments
+  customColor?: string; // custom color for deadline events
 }
 
 export interface Brand {
@@ -63,6 +65,7 @@ export interface FilterState {
   seasons: boolean;       // Seasonal markers
   brandDates: boolean;    // User-created brand moments
   campaignFlights: boolean; // User-created campaigns
+  deadlines: boolean;     // User-created deadlines
 }
 
 // Event template types for quick add
@@ -95,13 +98,14 @@ export interface PlanningPrompt {
 // Sort priority for event types (lower = higher priority)
 export const EVENT_TYPE_PRIORITY: Record<EventType, number> = {
   publicHoliday: 0,
-  backToSchool: 1,
-  schoolTerm: 2,
-  brandMoment: 3,
-  campaignFlight: 4,
-  keyDate: 5,
-  culture: 6,
-  season: 7,
+  deadline: 1, // Deadlines are high priority
+  backToSchool: 2,
+  schoolTerm: 3,
+  brandMoment: 4,
+  campaignFlight: 5,
+  keyDate: 6,
+  culture: 7,
+  season: 8,
 };
 
 // Color mapping for event types (holiday + culture both use 'keydate' style)
@@ -114,6 +118,7 @@ export const EVENT_TYPE_COLORS: Record<EventType, string> = {
   brandMoment: 'brand',
   campaignFlight: 'campaign',
   keyDate: 'keydate', // User-added key dates use same gray style
+  deadline: 'deadline', // Custom color from event.customColor
 };
 
 // Event template configurations

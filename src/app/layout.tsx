@@ -3,6 +3,7 @@ import './globals.css';
 import { DataAutoLoader } from '@/components/DataAutoLoader';
 import { UndoToast } from '@/components/UndoToast';
 import { DebugPanel } from '@/components/DebugPanel';
+import { InteractionDebugger } from '@/components/InteractionDebugger';
 
 export const metadata: Metadata = {
   title: 'SA Marketing Calendar',
@@ -29,6 +30,7 @@ export default function RootLayout({
         {children}
         <UndoToast />
         <DebugPanel />
+        <InteractionDebugger />
       </body>
     </html>
   );

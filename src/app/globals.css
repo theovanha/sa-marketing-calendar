@@ -86,11 +86,15 @@
     @apply bg-white/10 text-white border-l-2 border-white;
   }
   
-  /* Campaign events - YELLOW accent */
+  /* Campaign events - WHITE, prominent (same as brand) */
   .event-pill-campaign {
-    background-color: rgba(250, 204, 21, 0.15);
-    color: #FACC15;
-    border-left: 2px solid #FACC15;
+    @apply bg-white/10 text-white border-l-2 border-white;
+  }
+  
+  /* Deadline events - uses custom color */
+  .event-pill-deadline {
+    @apply border-l-2;
+    /* Color set via inline style using event.customColor */
   }
   
   /* Range bar for campaign flights */
@@ -232,8 +236,7 @@
   }
   
   .badge-campaign {
-    background-color: rgba(250, 204, 21, 0.15);
-    color: #FACC15;
+    @apply bg-white/10 text-white;
   }
 }
 

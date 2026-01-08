@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { CalendarEvent, EVENT_TYPE_COLORS } from '@/lib/types';
 import { formatDate, formatDateRange, cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
-import { Flag, GraduationCap, BookOpen, Sun, Star, Target, Rocket, X, Check } from 'lucide-react';
+import { Flag, GraduationCap, BookOpen, Sun, Star, Target, Rocket, X, Check, Clock } from 'lucide-react';
 
 interface EventPillProps {
   event: CalendarEvent;
@@ -20,6 +20,7 @@ const TYPE_ICONS: Record<string, typeof Flag> = {
   brandMoment: Target,
   campaignFlight: Rocket,
   keyDate: Star, // Key dates use star icon
+  deadline: Clock, // Deadline uses clock icon
 };
 
 export function EventPill({ event, compact = false }: EventPillProps) {
@@ -70,26 +71,43 @@ export function EventPill({ event, compact = false }: EventPillProps) {
   
   // Styling rules based on event type:
   // - Brand = white (highlighted)
-  // - Campaign = yellow (highlighted)
+  // - Campaign = white (highlighted)
+  // - Deadline = custom color
   // - Key Date, School, Season, Public Holiday, Culture = gray
   const isBrandMoment = event.type === 'brandMoment';
   const isCampaign = event.type === 'campaignFlight';
-  const isHighlightedType = isBrandMoment || isCampaign;
+  const isDeadline = event.type === 'deadline';
+  const isHighlightedType = isBrandMoment || isCampaign || isDeadline;
   const isPublicHoliday = event.type === 'publicHoliday';
   const isGlobalEvent = event.brandId === null;
   
-  // VANHA green for public holidays, yellow for campaigns, white for brand, gray for others
-  const textColor = isPublicHoliday 
-    ? '#00F59B'  // VANHA green for public holidays
-    : isCampaign
-      ? '#FACC15'  // Yellow for campaigns
-      : isBrandMoment
-        ? '#ffffff'  // White for Brand
+  // Custom color for deadline, VANHA green for public holidays, white for brand & campaigns, gray for others
+  const textColor = isDeadline && event.customColor
+    ? event.customColor  // Custom color for deadlines
+    : isPublicHoliday 
+      ? '#00F59B'  // VANHA green for public holidays
+      : (isCampaign || isBrandMoment)
+        ? '#ffffff'  // White for Brand & Campaign
         : '#a1a1aa'; // Gray for Key Date, School, Season, etc.
 
   // Format date with day abbreviation: "5 Fri"
   const formatDayWithWeekday = (dateStr: string) => {
     return formatDate(dateStr, 'd EEE'); // e.g., "5 Fri"
+  };
+
+  // Format date range: "5 - 8 Jan" or "28 Jan - 2 Feb"
+  const formatShortRange = (startDate: string, endDate: string) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const startDay = formatDate(startDate, 'd');
+    const endDay = formatDate(endDate, 'd');
+    const startMonth = formatDate(startDate, 'MMM');
+    const endMonth = formatDate(endDate, 'MMM');
+    
+    if (startMonth === endMonth) {
+      return `${startDay} - ${endDay} ${startMonth}`;
+    }
+    return `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
   };
 
   if (isEditing) {
@@ -119,6 +137,12 @@ export function EventPill({ event, compact = false }: EventPillProps) {
     );
   }
 
+  // Generate inline styles for deadline events
+  const deadlineStyles = isDeadline && event.customColor ? {
+    backgroundColor: `${event.customColor}26`, // 15% opacity
+    borderLeftColor: event.customColor,
+  } : undefined;
+
   return (
     <div
       className="relative group"
@@ -133,14 +157,17 @@ export function EventPill({ event, compact = false }: EventPillProps) {
           !isHighlightedType && !isPublicHoliday && 'event-pill-muted',
           isPublicHoliday && 'event-pill-holiday-green'
         )}
+        style={deadlineStyles}
         title={`${event.title} - ${formatDateRange(event.startDate, event.endDate)} (double-click to edit)`}
       >
         <Icon className={cn('w-3 h-3 shrink-0', !isHighlightedType && !isPublicHoliday ? 'opacity-60' : '')} style={{ color: textColor }} />
         <span className="truncate flex-1" style={{ color: textColor }}>{event.title}</span>
         {!compact && (
-          <span className={cn('text-[10px] shrink-0 font-mono', !isHighlightedType ? 'opacity-50' : 'opacity-70')}>
-            {formatDayWithWeekday(event.startDate)}
-            {isRange && `–${formatDayWithWeekday(event.endDate!)}`}
+          <span className={cn('text-[10px] shrink-0 font-mono', !isHighlightedType ? 'opacity-50' : 'opacity-70')} style={isDeadline ? { color: textColor } : undefined}>
+            {isRange 
+              ? formatShortRange(event.startDate, event.endDate!)
+              : formatDayWithWeekday(event.startDate)
+            }
           </span>
         )}
       </div>

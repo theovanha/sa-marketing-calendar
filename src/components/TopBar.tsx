@@ -11,6 +11,7 @@ import {
   Sun,
   Target,
   Rocket,
+  Clock,
 } from 'lucide-react';
 import { useAppStore, useActiveBrands, useSelectedBrand } from '@/lib/store';
 import { Input, FilterChip, Select } from './ui';
@@ -62,7 +63,8 @@ export function TopBar() {
     { key: 'school' as const, label: 'School', icon: GraduationCap, color: '#8B5CF6' },
     { key: 'seasons' as const, label: 'Seasons', icon: Sun, color: '#22D3EE' },
     { key: 'brandDates' as const, label: 'Brand', icon: Target, color: '#FFFFFF' },
-    { key: 'campaignFlights' as const, label: 'Campaigns', icon: Rocket, color: '#00F59B' },
+    { key: 'campaignFlights' as const, label: 'Campaigns', icon: Rocket, color: '#FFFFFF' },
+    { key: 'deadlines' as const, label: 'Deadlines', icon: Clock, color: '#ef4444' },
   ];
 
   return (
