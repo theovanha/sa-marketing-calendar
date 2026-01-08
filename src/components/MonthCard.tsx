@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { CalendarEvent, EventType } from '@/lib/types';
 import { MONTH_NAMES_SHORT, MONTH_NAMES, DEADLINE_COLORS, cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
-import { EventPill, RangeBar } from './EventPill';
+import { EventPill } from './EventPill';
 import { DailyViewModal } from './DailyViewModal';
 import { ChevronDown, ChevronUp, Plus, CalendarDays } from 'lucide-react';
 
@@ -129,20 +129,10 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
   
   // Get days in month for the date picker
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  
-  // Event types that support multi-day ranges
-  const multiDayTypes: EventType[] = ['brandMoment', 'campaignFlight', 'deadline'];
-  
-  // Separate single-day events from range events
-  const singleEvents = events.filter(
-    (e) => !e.endDate || e.endDate === e.startDate || !multiDayTypes.includes(e.type)
-  );
-  const rangeEvents = events.filter(
-    (e) => e.endDate && e.endDate !== e.startDate && multiDayTypes.includes(e.type)
-  );
 
-  const visibleEvents = isExpanded ? singleEvents : singleEvents.slice(0, maxVisible);
-  const hiddenCount = singleEvents.length - maxVisible;
+  // All events are shown consistently with EventPill
+  const visibleEvents = isExpanded ? events : events.slice(0, maxVisible);
+  const hiddenCount = events.length - maxVisible;
 
   // Check if this is the current month
   const now = new Date();
@@ -205,25 +195,6 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
               </>
             )}
           </button>
-        )}
-
-        {/* Range events (campaign flights) */}
-        {rangeEvents.length > 0 && (
-          <div className="pt-2 mt-2 border-t border-surface-800 space-y-2">
-            {rangeEvents.slice(0, 3).map((event) => (
-              <RangeBar
-                key={event.id}
-                event={event}
-                monthStart={1}
-                monthEnd={31}
-              />
-            ))}
-            {rangeEvents.length > 3 && (
-              <div className="text-xs text-surface-500">
-                +{rangeEvents.length - 3} more flights
-              </div>
-            )}
-          </div>
         )}
 
         {/* Empty state */}

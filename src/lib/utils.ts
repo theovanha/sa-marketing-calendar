@@ -10,7 +10,7 @@ import {
   getYear,
   addYears,
 } from 'date-fns';
-import type { CalendarEvent, EventType, EVENT_TYPE_PRIORITY } from './types';
+import type { CalendarEvent } from './types';
 
 // Tailwind class merge utility
 export function cn(...inputs: ClassValue[]) {
@@ -68,23 +68,17 @@ export function getEventsForMonth(
   return events.filter((event) => eventIntersectsMonth(event, year, month));
 }
 
-// Sort events by type priority, then by date
+// Sort events: public holidays first, then everything else by start date
 export function sortEvents(events: CalendarEvent[]): CalendarEvent[] {
-  const priorities: Record<EventType, number> = {
-    publicHoliday: 0,
-    deadline: 1,
-    backToSchool: 2,
-    schoolTerm: 3,
-    brandMoment: 4,
-    campaignFlight: 5,
-    keyDate: 6,
-    culture: 7,
-    season: 8,
-  };
-  
   return [...events].sort((a, b) => {
-    const priorityDiff = priorities[a.type] - priorities[b.type];
-    if (priorityDiff !== 0) return priorityDiff;
+    // Public holidays always come first
+    const aIsHoliday = a.type === 'publicHoliday';
+    const bIsHoliday = b.type === 'publicHoliday';
+    
+    if (aIsHoliday && !bIsHoliday) return -1;
+    if (!aIsHoliday && bIsHoliday) return 1;
+    
+    // Both are holidays or both are not - sort by start date
     return a.startDate.localeCompare(b.startDate);
   });
 }
