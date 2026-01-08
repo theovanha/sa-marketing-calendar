@@ -711,7 +711,7 @@ export function DailyViewModal({ month, year, events, onClose }: DailyViewModalP
       };
       const previewPos = calcEventPosition(previewWithEnd, weekDays);
       if (previewPos) {
-        results.push({ ...previewPos, isPreview: true, isSingleDay: !previewEvent.endDate });
+        results.push({ ...previewPos, isPreview: true });
       }
     }
     
