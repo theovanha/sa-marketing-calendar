@@ -1,0 +1,48 @@
+{
+  "year": 2026,
+  "country": "uk",
+  "holidays": [
+    {
+      "title": "🇬🇧 Good Friday",
+      "startDate": "2026-04-03",
+      "importance": "high",
+      "tags": ["bank holiday", "easter"],
+      "notes": "UK Bank Holiday - Easter weekend begins"
+    },
+    {
+      "title": "🇬🇧 Easter Monday",
+      "startDate": "2026-04-06",
+      "importance": "high",
+      "tags": ["bank holiday", "easter"],
+      "notes": "UK Bank Holiday - Easter weekend ends"
+    },
+    {
+      "title": "🇬🇧 Early May Bank Holiday",
+      "startDate": "2026-05-04",
+      "importance": "med",
+      "tags": ["bank holiday"],
+      "notes": "UK Bank Holiday"
+    },
+    {
+      "title": "🇬🇧 Spring Bank Holiday",
+      "startDate": "2026-05-25",
+      "importance": "med",
+      "tags": ["bank holiday"],
+      "notes": "UK Bank Holiday"
+    },
+    {
+      "title": "🇬🇧 Summer Bank Holiday",
+      "startDate": "2026-08-31",
+      "importance": "med",
+      "tags": ["bank holiday", "summer"],
+      "notes": "UK Bank Holiday - end of summer"
+    },
+    {
+      "title": "🇬🇧 Boxing Day",
+      "startDate": "2026-12-26",
+      "importance": "high",
+      "tags": ["bank holiday", "retail", "sales"],
+      "notes": "UK Bank Holiday - major retail sales day"
+    }
+  ]
+}

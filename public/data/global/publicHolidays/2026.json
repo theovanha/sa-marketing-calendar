@@ -1,0 +1,127 @@
+{
+  "year": 2026,
+  "country": "global",
+  "holidays": [
+    {
+      "title": "🎆 New Year's Day",
+      "startDate": "2026-01-01",
+      "importance": "high",
+      "tags": ["celebration", "global"],
+      "notes": "Start of the new year - global celebration"
+    },
+    {
+      "title": "🐴 Chinese New Year",
+      "startDate": "2026-02-17",
+      "importance": "high",
+      "tags": ["cultural", "asian", "lunar", "retail"],
+      "notes": "Year of the Horse - major celebration across Asia and Chinese communities worldwide"
+    },
+    {
+      "title": "💕 Valentine's Day",
+      "startDate": "2026-02-14",
+      "importance": "high",
+      "tags": ["love", "retail", "gifting"],
+      "notes": "Global day of love and romance"
+    },
+    {
+      "title": "☪️ Ramadan Begins",
+      "startDate": "2026-02-17",
+      "endDate": "2026-03-18",
+      "importance": "high",
+      "tags": ["religious", "islamic", "fasting"],
+      "notes": "Islamic holy month of fasting - impacts work schedules and consumption patterns in Muslim-majority regions"
+    },
+    {
+      "title": "👩 International Women's Day",
+      "startDate": "2026-03-08",
+      "importance": "high",
+      "tags": ["awareness", "women", "equality"],
+      "notes": "Global day celebrating women's achievements and advocating for gender equality"
+    },
+    {
+      "title": "🌙 Eid al-Fitr",
+      "startDate": "2026-03-19",
+      "endDate": "2026-03-20",
+      "importance": "high",
+      "tags": ["religious", "islamic", "celebration", "retail"],
+      "notes": "End of Ramadan - major celebration and gifting period in Muslim communities"
+    },
+    {
+      "title": "🌍 Earth Day",
+      "startDate": "2026-04-22",
+      "importance": "med",
+      "tags": ["environment", "sustainability"],
+      "notes": "Annual event to demonstrate support for environmental protection"
+    },
+    {
+      "title": "👷 International Workers' Day",
+      "startDate": "2026-05-01",
+      "importance": "med",
+      "tags": ["workers", "labor"],
+      "notes": "Celebration of laborers and the working classes"
+    },
+    {
+      "title": "💐 Mother's Day (Global)",
+      "startDate": "2026-05-10",
+      "importance": "high",
+      "tags": ["family", "gifting", "retail"],
+      "notes": "Second Sunday of May - celebrated in most countries (dates vary in UK, AU)"
+    },
+    {
+      "title": "🌙 Eid al-Adha",
+      "startDate": "2026-05-27",
+      "importance": "high",
+      "tags": ["religious", "islamic", "celebration"],
+      "notes": "Islamic Festival of Sacrifice - one of the holiest days in Islam"
+    },
+    {
+      "title": "👔 Father's Day (Global)",
+      "startDate": "2026-06-21",
+      "importance": "high",
+      "tags": ["family", "gifting", "retail"],
+      "notes": "Third Sunday of June - celebrated in most countries (dates vary in AU, UK)"
+    },
+    {
+      "title": "🧠 World Mental Health Day",
+      "startDate": "2026-10-10",
+      "importance": "med",
+      "tags": ["awareness", "health", "mental health"],
+      "notes": "Global awareness day for mental health education and advocacy"
+    },
+    {
+      "title": "🪔 Diwali",
+      "startDate": "2026-10-20",
+      "importance": "high",
+      "tags": ["cultural", "hindu", "celebration", "retail"],
+      "notes": "Festival of Lights - major celebration for Hindu, Sikh, and Jain communities worldwide"
+    },
+    {
+      "title": "🎃 Halloween",
+      "startDate": "2026-10-31",
+      "importance": "high",
+      "tags": ["celebration", "retail", "costumes"],
+      "notes": "Global celebration with costumes and festivities"
+    },
+    {
+      "title": "🛒 Singles' Day (11.11)",
+      "startDate": "2026-11-11",
+      "importance": "high",
+      "tags": ["retail", "ecommerce", "shopping"],
+      "notes": "World's largest online shopping day - originated in China, now global"
+    },
+    {
+      "title": "🎄 Christmas Day",
+      "startDate": "2026-12-25",
+      "importance": "high",
+      "tags": ["celebration", "retail", "gifting", "family"],
+      "notes": "Global celebration of Christmas"
+    },
+    {
+      "title": "🎊 New Year's Eve",
+      "startDate": "2026-12-31",
+      "importance": "high",
+      "tags": ["celebration", "global"],
+      "notes": "End of year celebrations worldwide"
+    }
+  ]
+}

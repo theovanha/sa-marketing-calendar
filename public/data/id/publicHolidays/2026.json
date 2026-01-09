@@ -1,0 +1,56 @@
+{
+  "year": 2026,
+  "country": "id",
+  "holidays": [
+    {
+      "title": "🇮🇩 Isra Mi'raj",
+      "startDate": "2026-02-07",
+      "importance": "high",
+      "tags": ["religious", "islamic"],
+      "notes": "Islamic holiday commemorating the Prophet's night journey"
+    },
+    {
+      "title": "🇮🇩 Nyepi (Balinese New Year)",
+      "startDate": "2026-03-19",
+      "importance": "high",
+      "tags": ["religious", "hindu", "bali"],
+      "notes": "Balinese Day of Silence - Hindu New Year"
+    },
+    {
+      "title": "🇮🇩 Eid al-Fitr",
+      "startDate": "2026-03-20",
+      "endDate": "2026-03-21",
+      "importance": "high",
+      "tags": ["religious", "islamic", "retail"],
+      "notes": "End of Ramadan - major celebration and shopping period"
+    },
+    {
+      "title": "🇮🇩 Waisak (Buddha's Birthday)",
+      "startDate": "2026-05-12",
+      "importance": "med",
+      "tags": ["religious", "buddhist"],
+      "notes": "Buddhist holiday celebrating Buddha's birth"
+    },
+    {
+      "title": "🇮🇩 Eid al-Adha",
+      "startDate": "2026-05-27",
+      "importance": "high",
+      "tags": ["religious", "islamic"],
+      "notes": "Islamic Festival of Sacrifice"
+    },
+    {
+      "title": "🇮🇩 Independence Day",
+      "startDate": "2026-08-17",
+      "importance": "high",
+      "tags": ["national holiday", "celebration"],
+      "notes": "Indonesian Independence Day"
+    },
+    {
+      "title": "🇮🇩 Maulid Nabi Muhammad",
+      "startDate": "2026-09-05",
+      "importance": "med",
+      "tags": ["religious", "islamic"],
+      "notes": "Prophet Muhammad's Birthday"
+    }
+  ]
+}

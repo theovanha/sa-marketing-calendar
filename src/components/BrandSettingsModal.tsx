@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Upload, Check } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
-import { Brand } from '@/lib/types';
-import { BRAND_COLORS } from '@/lib/utils';
+import { Brand, CountryCode, COUNTRY_OPTIONS } from '@/lib/types';
+import { BRAND_COLORS, cn } from '@/lib/utils';
 
 interface BrandSettingsModalProps {
   brand: Brand;
@@ -12,11 +12,53 @@ interface BrandSettingsModalProps {
   onClose: () => void;
 }
 
+interface CountryToggleConfirmProps {
+  country: typeof COUNTRY_OPTIONS[0];
+  onConfirm: (clearHidden: boolean) => void;
+  onCancel: () => void;
+}
+
+function CountryToggleConfirm({ country, onConfirm, onCancel }: CountryToggleConfirmProps) {
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60" onClick={onCancel} />
+      <div className="relative bg-surface-800 border border-surface-600 rounded-lg p-5 max-w-sm shadow-2xl">
+        <h3 className="text-white font-semibold mb-2">Add {country.label} Events?</h3>
+        <p className="text-sm text-surface-400 mb-4">
+          You previously hid some events from {country.label}. What would you like to do?
+        </p>
+        <div className="space-y-2">
+          <button
+            onClick={() => onConfirm(true)}
+            className="w-full py-2 px-3 text-sm bg-[#00F59B] text-black font-medium rounded hover:bg-[#00F59B]/90 transition-colors"
+          >
+            Show all events (reset hidden)
+          </button>
+          <button
+            onClick={() => onConfirm(false)}
+            className="w-full py-2 px-3 text-sm bg-surface-700 text-surface-200 rounded hover:bg-surface-600 transition-colors"
+          >
+            Keep previously hidden events hidden
+          </button>
+          <button
+            onClick={onCancel}
+            className="w-full py-2 px-3 text-sm text-surface-400 hover:text-white transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function BrandSettingsModal({ brand, open, onClose }: BrandSettingsModalProps) {
-  const { updateBrand } = useAppStore();
+  const { updateBrand, clearHiddenEventsForCountry } = useAppStore();
   const [brandName, setBrandName] = useState(brand.name);
   const [selectedColor, setSelectedColor] = useState(brand.primaryColor);
   const [logoPreview, setLogoPreview] = useState(brand.logo || '');
+  const [selectedCountries, setSelectedCountries] = useState<CountryCode[]>(brand.countries || ['za']);
+  const [pendingCountry, setPendingCountry] = useState<typeof COUNTRY_OPTIONS[0] | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync state when modal opens or brand changes
@@ -25,6 +67,7 @@ export function BrandSettingsModal({ brand, open, onClose }: BrandSettingsModalP
       setBrandName(brand.name);
       setSelectedColor(brand.primaryColor);
       setLogoPreview(brand.logo || '');
+      setSelectedCountries(brand.countries || ['za']);
     }
   }, [open, brand]);
 
@@ -32,6 +75,33 @@ export function BrandSettingsModal({ brand, open, onClose }: BrandSettingsModalP
 
   const handleColorSelect = (color: string) => {
     setSelectedColor(color);
+  };
+
+  const toggleCountry = (code: CountryCode) => {
+    if (selectedCountries.includes(code)) {
+      // Removing a country - just do it (if not the last one)
+      if (selectedCountries.length === 1) return;
+      setSelectedCountries(prev => prev.filter(c => c !== code));
+    } else {
+      // Adding a country - check if we need to show the prompt
+      const country = COUNTRY_OPTIONS.find(c => c.code === code);
+      if (country) {
+        // For simplicity, always show the prompt when adding a country
+        // In a real app, we'd check if there are hidden events for this country
+        setPendingCountry(country);
+      }
+    }
+  };
+
+  const handleCountryConfirm = (clearHidden: boolean) => {
+    if (!pendingCountry) return;
+    
+    if (clearHidden && clearHiddenEventsForCountry) {
+      clearHiddenEventsForCountry(brand.id, pendingCountry.code);
+    }
+    
+    setSelectedCountries(prev => [...prev, pendingCountry.code]);
+    setPendingCountry(null);
   };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,11 +130,12 @@ export function BrandSettingsModal({ brand, open, onClose }: BrandSettingsModalP
   };
 
   const handleSave = () => {
-    if (!brandName.trim()) return; // Don't save empty name
+    if (!brandName.trim()) return;
     updateBrand(brand.id, {
       name: brandName.trim(),
       primaryColor: selectedColor,
       logo: logoPreview || undefined,
+      countries: selectedCountries,
     });
     onClose();
   };
@@ -78,9 +149,9 @@ export function BrandSettingsModal({ brand, open, onClose }: BrandSettingsModalP
       />
       
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div 
-          className="bg-surface-900 border border-surface-700 rounded-lg w-full max-w-md shadow-2xl"
+          className="bg-surface-900 border border-surface-700 rounded-lg w-full max-w-md shadow-2xl my-8"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -95,7 +166,7 @@ export function BrandSettingsModal({ brand, open, onClose }: BrandSettingsModalP
           </div>
 
           {/* Content */}
-          <div className="px-5 py-4 space-y-6">
+          <div className="px-5 py-4 space-y-6 max-h-[60vh] overflow-y-auto">
             {/* Brand Name Section */}
             <div>
               <label className="block text-sm font-medium text-surface-300 mb-2">
@@ -108,6 +179,56 @@ export function BrandSettingsModal({ brand, open, onClose }: BrandSettingsModalP
                 className="w-full px-3 py-2 bg-surface-800 border border-surface-700 rounded-lg text-white placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-[#00F59B] focus:border-transparent"
                 placeholder="Enter brand name"
               />
+            </div>
+
+            {/* Countries Section */}
+            <div>
+              <label className="block text-sm font-medium text-surface-300 mb-2">
+                Key Events Countries
+              </label>
+              <p className="text-xs text-surface-500 mb-3">
+                Select which countries' holidays and events to show
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {COUNTRY_OPTIONS.map(({ code, label, description }) => {
+                  const isSelected = selectedCountries.includes(code);
+                  return (
+                    <button
+                      key={code}
+                      type="button"
+                      onClick={() => toggleCountry(code)}
+                      className={cn(
+                        'flex items-start gap-2 p-2.5 rounded-lg border text-left transition-all',
+                        isSelected
+                          ? 'border-[#00F59B] bg-[#00F59B]/10'
+                          : 'border-surface-700 hover:border-surface-600 bg-surface-800/50'
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          'w-4 h-4 rounded border flex items-center justify-center shrink-0 mt-0.5',
+                          isSelected
+                            ? 'bg-[#00F59B] border-[#00F59B]'
+                            : 'border-surface-600'
+                        )}
+                      >
+                        {isSelected && <Check className="w-3 h-3 text-black" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className={cn(
+                          'text-xs font-medium',
+                          isSelected ? 'text-white' : 'text-surface-300'
+                        )}>
+                          {label}
+                        </div>
+                        <div className="text-[10px] text-surface-500 truncate">
+                          {description}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Logo Section */}
@@ -226,10 +347,15 @@ export function BrandSettingsModal({ brand, open, onClose }: BrandSettingsModalP
           </div>
         </div>
       </div>
+
+      {/* Country toggle confirmation dialog */}
+      {pendingCountry && (
+        <CountryToggleConfirm
+          country={pendingCountry}
+          onConfirm={handleCountryConfirm}
+          onCancel={() => setPendingCountry(null)}
+        />
+      )}
     </>
   );
 }
-
-
-
-

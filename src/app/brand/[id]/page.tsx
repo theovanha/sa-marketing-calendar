@@ -74,7 +74,12 @@ export default function BrandCalendarPage() {
             )}
           </button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">{selectedBrand.name}</h1>
+            <h1 
+              onClick={() => setShowSettings(true)}
+              className="text-xl font-bold text-white cursor-pointer hover:text-surface-200 transition-colors"
+            >
+              {selectedBrand.name}
+            </h1>
             <p className="text-xs text-surface-500 uppercase tracking-wider">
               {useAppStore.getState().selectedYear} Marketing Calendar
             </p>

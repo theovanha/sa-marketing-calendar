@@ -1,0 +1,140 @@
+{
+  "year": 2026,
+  "country": "global",
+  "moments": [
+    {
+      "title": "🎾 Australian Open",
+      "startDate": "2026-01-19",
+      "endDate": "2026-02-01",
+      "importance": "high",
+      "tags": ["sport", "tennis", "grand slam"],
+      "notes": "First tennis Grand Slam of the year - Melbourne, Australia"
+    },
+    {
+      "title": "🏈 Super Bowl LX",
+      "startDate": "2026-02-08",
+      "importance": "high",
+      "tags": ["sport", "american football", "advertising"],
+      "notes": "NFL Championship game - major advertising moment globally"
+    },
+    {
+      "title": "🏏 T20 Cricket World Cup",
+      "startDate": "2026-02-09",
+      "endDate": "2026-03-07",
+      "importance": "high",
+      "tags": ["sport", "cricket", "world cup"],
+      "notes": "ICC Men's T20 World Cup - India & Sri Lanka"
+    },
+    {
+      "title": "🏔️ Winter Olympics 2026",
+      "startDate": "2026-02-06",
+      "endDate": "2026-02-22",
+      "importance": "high",
+      "tags": ["sport", "olympics", "winter sports"],
+      "notes": "XXV Olympic Winter Games - Milan-Cortina, Italy"
+    },
+    {
+      "title": "🏔️ Winter Paralympics 2026",
+      "startDate": "2026-03-06",
+      "endDate": "2026-03-15",
+      "importance": "med",
+      "tags": ["sport", "paralympics", "winter sports"],
+      "notes": "XIV Paralympic Winter Games - Milan-Cortina, Italy"
+    },
+    {
+      "title": "🏎️ Formula 1 Season Start",
+      "startDate": "2026-03-15",
+      "importance": "med",
+      "tags": ["sport", "motorsport", "f1"],
+      "notes": "Formula 1 World Championship season begins"
+    },
+    {
+      "title": "⛳ The Masters",
+      "startDate": "2026-04-09",
+      "endDate": "2026-04-12",
+      "importance": "high",
+      "tags": ["sport", "golf", "major"],
+      "notes": "First golf major of the year - Augusta National, Georgia"
+    },
+    {
+      "title": "⛳ PGA Championship",
+      "startDate": "2026-05-14",
+      "endDate": "2026-05-17",
+      "importance": "high",
+      "tags": ["sport", "golf", "major"],
+      "notes": "Second golf major of the year"
+    },
+    {
+      "title": "🎾 French Open (Roland-Garros)",
+      "startDate": "2026-05-24",
+      "endDate": "2026-06-07",
+      "importance": "high",
+      "tags": ["sport", "tennis", "grand slam"],
+      "notes": "Second tennis Grand Slam - Paris, France (clay court)"
+    },
+    {
+      "title": "⚽ FIFA World Cup 2026",
+      "startDate": "2026-06-11",
+      "endDate": "2026-07-19",
+      "importance": "high",
+      "tags": ["sport", "football", "soccer", "world cup"],
+      "notes": "FIFA World Cup hosted by USA, Canada, and Mexico - the biggest sporting event globally. First 48-team World Cup."
+    },
+    {
+      "title": "⛳ U.S. Open (Golf)",
+      "startDate": "2026-06-18",
+      "endDate": "2026-06-21",
+      "importance": "high",
+      "tags": ["sport", "golf", "major"],
+      "notes": "Third golf major of the year - Shinnecock Hills, New York"
+    },
+    {
+      "title": "🎾 Wimbledon",
+      "startDate": "2026-06-29",
+      "endDate": "2026-07-12",
+      "importance": "high",
+      "tags": ["sport", "tennis", "grand slam"],
+      "notes": "Third tennis Grand Slam - The Championships, Wimbledon (grass court)"
+    },
+    {
+      "title": "🚴 Tour de France",
+      "startDate": "2026-07-04",
+      "endDate": "2026-07-26",
+      "importance": "med",
+      "tags": ["sport", "cycling"],
+      "notes": "World's most prestigious cycling race"
+    },
+    {
+      "title": "⛳ The Open Championship",
+      "startDate": "2026-07-16",
+      "endDate": "2026-07-19",
+      "importance": "high",
+      "tags": ["sport", "golf", "major", "british open"],
+      "notes": "Fourth golf major - Royal Portrush, Northern Ireland"
+    },
+    {
+      "title": "🏉 Women's Rugby World Cup",
+      "startDate": "2026-08-22",
+      "endDate": "2026-09-26",
+      "importance": "high",
+      "tags": ["sport", "rugby", "world cup", "women"],
+      "notes": "Women's Rugby World Cup 2026 - England"
+    },
+    {
+      "title": "🎾 US Open (Tennis)",
+      "startDate": "2026-08-31",
+      "endDate": "2026-09-13",
+      "importance": "high",
+      "tags": ["sport", "tennis", "grand slam"],
+      "notes": "Fourth tennis Grand Slam - Flushing Meadows, New York"
+    },
+    {
+      "title": "🏏 ICC Champions Trophy",
+      "startDate": "2026-02-19",
+      "endDate": "2026-03-09",
+      "importance": "high",
+      "tags": ["sport", "cricket", "icc"],
+      "notes": "ICC Champions Trophy - Pakistan (ODI tournament)"
+    }
+  ]
+}

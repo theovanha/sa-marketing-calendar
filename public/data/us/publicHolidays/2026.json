@@ -1,0 +1,125 @@
+{
+  "year": 2026,
+  "country": "us",
+  "holidays": [
+    {
+      "title": "🇺🇸 Martin Luther King Jr. Day",
+      "startDate": "2026-01-19",
+      "importance": "high",
+      "tags": ["federal holiday", "civil rights"],
+      "notes": "Federal holiday honoring Martin Luther King Jr."
+    },
+    {
+      "title": "🇺🇸 Presidents' Day",
+      "startDate": "2026-02-16",
+      "importance": "med",
+      "tags": ["federal holiday", "retail"],
+      "notes": "Federal holiday - major retail sales period"
+    },
+    {
+      "title": "☘️ St. Patrick's Day",
+      "startDate": "2026-03-17",
+      "importance": "med",
+      "tags": ["cultural", "celebration", "retail"],
+      "notes": "Irish cultural celebration - big in US cities, bar/restaurant promotions"
+    },
+    {
+      "title": "🐣 Easter Sunday",
+      "startDate": "2026-04-05",
+      "importance": "high",
+      "tags": ["religious", "family", "retail"],
+      "notes": "Christian holiday - major retail moment for candy, gifts, apparel"
+    },
+    {
+      "title": "📋 Tax Day",
+      "startDate": "2026-04-15",
+      "importance": "med",
+      "tags": ["financial", "deadline"],
+      "notes": "Federal income tax filing deadline - financial services marketing moment"
+    },
+    {
+      "title": "💐 Mother's Day",
+      "startDate": "2026-05-10",
+      "importance": "high",
+      "tags": ["family", "gifting", "retail"],
+      "notes": "Second Sunday of May - one of the biggest retail days in the US"
+    },
+    {
+      "title": "🇺🇸 Memorial Day",
+      "startDate": "2026-05-25",
+      "importance": "high",
+      "tags": ["federal holiday", "summer", "retail"],
+      "notes": "Federal holiday honoring military personnel - start of summer sales"
+    },
+    {
+      "title": "✊ Juneteenth",
+      "startDate": "2026-06-19",
+      "importance": "high",
+      "tags": ["federal holiday", "civil rights", "celebration"],
+      "notes": "Federal holiday commemorating the end of slavery in the US"
+    },
+    {
+      "title": "👔 Father's Day",
+      "startDate": "2026-06-21",
+      "importance": "high",
+      "tags": ["family", "gifting", "retail"],
+      "notes": "Third Sunday of June - major gifting and retail moment"
+    },
+    {
+      "title": "🇺🇸 Independence Day",
+      "startDate": "2026-07-04",
+      "importance": "high",
+      "tags": ["federal holiday", "celebration", "retail"],
+      "notes": "US Independence Day - major celebration and retail moment"
+    },
+    {
+      "title": "🇺🇸 Labor Day",
+      "startDate": "2026-09-07",
+      "importance": "high",
+      "tags": ["federal holiday", "retail", "back to school"],
+      "notes": "Federal holiday - end of summer, back to school sales"
+    },
+    {
+      "title": "🇺🇸 Columbus Day / Indigenous Peoples' Day",
+      "startDate": "2026-10-12",
+      "importance": "med",
+      "tags": ["federal holiday"],
+      "notes": "Federal holiday - observed differently across states"
+    },
+    {
+      "title": "🗳️ Election Day (Midterms)",
+      "startDate": "2026-11-03",
+      "importance": "high",
+      "tags": ["political", "civic"],
+      "notes": "2026 Midterm Elections - Congressional races, state governors"
+    },
+    {
+      "title": "🎖️ Veterans Day",
+      "startDate": "2026-11-11",
+      "importance": "high",
+      "tags": ["federal holiday", "military", "retail"],
+      "notes": "Federal holiday honoring military veterans - many retailers offer discounts"
+    },
+    {
+      "title": "🦃 Thanksgiving",
+      "startDate": "2026-11-26",
+      "importance": "high",
+      "tags": ["federal holiday", "family", "retail"],
+      "notes": "US Thanksgiving - major family and retail moment"
+    },
+    {
+      "title": "🛒 Black Friday",
+      "startDate": "2026-11-27",
+      "importance": "high",
+      "tags": ["retail", "sales", "shopping"],
+      "notes": "Biggest retail shopping day of the year"
+    },
+    {
+      "title": "💻 Cyber Monday",
+      "startDate": "2026-11-30",
+      "importance": "high",
+      "tags": ["retail", "ecommerce", "online sales"],
+      "notes": "Biggest online shopping day of the year"
+    }
+  ]
+}

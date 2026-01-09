@@ -1,4 +1,4 @@
-import type { CalendarEvent } from './types';
+import type { CalendarEvent, CountryCode } from './types';
 import type {
   PublicHolidaysFile,
   SchoolCalendarFile,
@@ -13,47 +13,62 @@ import {
 } from './schemas';
 
 // ============================================
-// SA Dataset Loader
+// Multi-Country Dataset Loader
 // Converts JSON dataset files into CalendarEvent objects
 // ============================================
 
 // Convert public holidays to CalendarEvents
-export function convertPublicHolidays(data: PublicHolidaysFile): CalendarEvent[] {
+export function convertPublicHolidays(data: PublicHolidaysFile, countryCode: string): CalendarEvent[] {
   return data.holidays.map((holiday, index) => ({
-    id: `za-holiday-${data.year}-${index}`,
+    id: `${countryCode}-holiday-${data.year}-${index}`,
     brandId: null, // Global events
     title: holiday.title,
     type: 'publicHoliday',
     startDate: holiday.startDate,
     endDate: holiday.endDate,
-    tags: holiday.tags || [],
+    tags: [...(holiday.tags || []), countryCode],
     importance: holiday.importance || 'high',
     visibility: 'client',
     notes: holiday.notes,
   }));
 }
 
+// Convert sporting events to CalendarEvents (for global)
+export function convertSportingEvents(data: CulturalMomentsFile, countryCode: string): CalendarEvent[] {
+  return data.moments.map((moment, index) => ({
+    id: `${countryCode}-sport-${data.year}-${index}`,
+    brandId: null,
+    title: moment.title,
+    type: 'culture', // Use culture type for sporting events
+    startDate: moment.startDate,
+    endDate: moment.endDate,
+    tags: [...(moment.tags || []), countryCode, 'sporting'],
+    importance: moment.importance || 'high',
+    visibility: 'client',
+    notes: moment.notes,
+  }));
+}
+
 // Convert school calendar to CalendarEvents
 // Only creates single-day markers for term starts and holiday starts
-export function convertSchoolCalendar(data: SchoolCalendarFile): CalendarEvent[] {
+export function convertSchoolCalendar(data: SchoolCalendarFile, countryCode: string): CalendarEvent[] {
   const events: CalendarEvent[] = [];
 
-  data.terms.forEach((term, index) => {
+  data.terms.forEach((term) => {
     // Add term START marker
     events.push({
-      id: `za-term-start-${data.year}-${term.term}`,
+      id: `${countryCode}-term-start-${data.year}-${term.term}`,
       brandId: null,
       title: `📚 Term ${term.term} Starts`,
       type: 'backToSchool',
       startDate: term.startDate,
-      tags: ['school', 'back-to-school', 'retail'],
+      tags: ['school', 'back-to-school', 'retail', countryCode],
       importance: 'high',
       visibility: 'client',
       notes: 'School term begins. Key retail moment for school supplies, uniforms, and stationery.',
     });
 
     // Add school HOLIDAY start marker (day after term ends)
-    // Calculate the next day after term ends as holiday start
     const termEndDate = new Date(term.endDate);
     const holidayStart = new Date(termEndDate);
     holidayStart.setDate(holidayStart.getDate() + 1);
@@ -62,12 +77,12 @@ export function convertSchoolCalendar(data: SchoolCalendarFile): CalendarEvent[]
     // Don't add holiday after Term 4 (it's just summer/festive)
     if (term.term < 4) {
       events.push({
-        id: `za-school-holiday-${data.year}-${term.term}`,
+        id: `${countryCode}-school-holiday-${data.year}-${term.term}`,
         brandId: null,
         title: `🏖️ School Holiday Starts`,
         type: 'schoolTerm',
         startDate: holidayStartStr,
-        tags: ['school', 'holiday', 'travel', 'family'],
+        tags: ['school', 'holiday', 'travel', 'family', countryCode],
         importance: 'med',
         visibility: 'client',
         notes: `School holidays begin after Term ${term.term}. Family travel and activities peak.`,
@@ -79,15 +94,15 @@ export function convertSchoolCalendar(data: SchoolCalendarFile): CalendarEvent[]
 }
 
 // Convert cultural moments to CalendarEvents
-export function convertCulturalMoments(data: CulturalMomentsFile): CalendarEvent[] {
+export function convertCulturalMoments(data: CulturalMomentsFile, countryCode: string): CalendarEvent[] {
   return data.moments.map((moment, index) => ({
-    id: `za-culture-${data.year}-${index}`,
+    id: `${countryCode}-culture-${data.year}-${index}`,
     brandId: null,
     title: moment.title,
     type: 'culture',
     startDate: moment.startDate,
     endDate: moment.endDate,
-    tags: moment.tags || [],
+    tags: [...(moment.tags || []), countryCode],
     importance: moment.importance || 'med',
     visibility: 'client',
     notes: moment.notes,
@@ -95,30 +110,21 @@ export function convertCulturalMoments(data: CulturalMomentsFile): CalendarEvent
 }
 
 // Convert seasons to CalendarEvents for a specific year
-// Only creates single-day markers for the START of each season
-export function convertSeasons(data: SeasonsFile, year: number): CalendarEvent[] {
+export function convertSeasons(data: SeasonsFile, year: number, countryCode: string): CalendarEvent[] {
   const events: CalendarEvent[] = [];
   
   data.seasons.forEach((season, index) => {
-    // Parse MM-DD format for start date
     const [startMonth, startDay] = season.startDate.split('-').map(Number);
-
-    // Handle year - Summer starts in December of the previous display year
-    // But we want to show it in the year the user is viewing
     let startYear = year;
     
-    // For Summer which starts Dec 1, show it in December of the selected year
-    // (it will also appear as the start of summer for next year's view)
     if (season.name === 'Summer' && startMonth === 12) {
       startYear = year;
     }
 
     const startDate = `${startYear}-${String(startMonth).padStart(2, '0')}-${String(startDay).padStart(2, '0')}`;
 
-    // Skip "Festive" as it overlaps with Summer and Christmas
     if (season.name === 'Festive') return;
 
-    // Create a friendly title
     const seasonTitles: Record<string, string> = {
       'Summer': '☀️ Summer Begins',
       'Autumn': '🍂 Autumn Begins',
@@ -127,13 +133,12 @@ export function convertSeasons(data: SeasonsFile, year: number): CalendarEvent[]
     };
 
     events.push({
-      id: `za-season-start-${year}-${index}`,
+      id: `${countryCode}-season-start-${year}-${index}`,
       brandId: null,
       title: seasonTitles[season.name] || `${season.name} Begins`,
       type: 'season',
       startDate,
-      // No endDate - single day event
-      tags: ['season', season.name.toLowerCase()],
+      tags: ['season', season.name.toLowerCase(), countryCode],
       importance: 'low',
       visibility: 'client',
       notes: season.notes,
@@ -143,89 +148,126 @@ export function convertSeasons(data: SeasonsFile, year: number): CalendarEvent[]
   return events;
 }
 
-// Load all SA data for a specific year
-export async function loadSADataset(year: number): Promise<{
+// Load data for a single country
+export async function loadCountryData(countryCode: CountryCode, year: number): Promise<{
   events: CalendarEvent[];
   errors: string[];
 }> {
   const events: CalendarEvent[] = [];
   const errors: string[] = [];
 
+  // Load public holidays (all countries have this)
   try {
-    // Load public holidays
-    const holidaysResponse = await fetch(`/data/za/publicHolidays/${year}.json`);
+    const holidaysResponse = await fetch(`/data/${countryCode}/publicHolidays/${year}.json`);
     if (holidaysResponse.ok) {
       const holidaysData = await holidaysResponse.json();
       const validation = validatePublicHolidays(holidaysData);
       if (validation.valid && validation.data) {
-        events.push(...convertPublicHolidays(validation.data));
+        events.push(...convertPublicHolidays(validation.data, countryCode));
       } else {
-        errors.push(`Public holidays: ${validation.errors?.map((e) => e.message).join(', ')}`);
+        errors.push(`${countryCode} public holidays: ${validation.errors?.map((e) => e.message).join(', ')}`);
       }
-    } else {
-      errors.push(`Public holidays file not found for ${year}`);
     }
   } catch (e) {
-    errors.push(`Failed to load public holidays: ${e}`);
+    // Silently skip if file doesn't exist
+    console.log(`No public holidays for ${countryCode}/${year}`);
   }
 
-  try {
-    // Load school calendar
-    const schoolResponse = await fetch(`/data/za/schoolCalendar/${year}.json`);
-    if (schoolResponse.ok) {
-      const schoolData = await schoolResponse.json();
-      const validation = validateSchoolCalendar(schoolData);
-      if (validation.valid && validation.data) {
-        events.push(...convertSchoolCalendar(validation.data));
-      } else {
-        errors.push(`School calendar: ${validation.errors?.map((e) => e.message).join(', ')}`);
+  // Load sporting events (global only)
+  if (countryCode === 'global') {
+    try {
+      const sportResponse = await fetch(`/data/${countryCode}/sportingEvents/${year}.json`);
+      if (sportResponse.ok) {
+        const sportData = await sportResponse.json();
+        const validation = validateCulturalMoments(sportData);
+        if (validation.valid && validation.data) {
+          events.push(...convertSportingEvents(validation.data, countryCode));
+        }
       }
-    } else {
-      errors.push(`School calendar file not found for ${year}`);
+    } catch (e) {
+      console.log(`No sporting events for ${year}`);
     }
-  } catch (e) {
-    errors.push(`Failed to load school calendar: ${e}`);
   }
 
+  // Load school calendar (only za has this currently)
+  if (countryCode === 'za') {
+    try {
+      const schoolResponse = await fetch(`/data/${countryCode}/schoolCalendar/${year}.json`);
+      if (schoolResponse.ok) {
+        const schoolData = await schoolResponse.json();
+        const validation = validateSchoolCalendar(schoolData);
+        if (validation.valid && validation.data) {
+          events.push(...convertSchoolCalendar(validation.data, countryCode));
+        }
+      }
+    } catch (e) {
+      console.log(`No school calendar for ${countryCode}/${year}`);
+    }
+  }
+
+  // Load cultural moments
   try {
-    // Load cultural moments
-    const cultureResponse = await fetch(`/data/za/culturalMoments/${year}.json`);
+    const cultureResponse = await fetch(`/data/${countryCode}/culturalMoments/${year}.json`);
     if (cultureResponse.ok) {
       const cultureData = await cultureResponse.json();
       const validation = validateCulturalMoments(cultureData);
       if (validation.valid && validation.data) {
-        events.push(...convertCulturalMoments(validation.data));
-      } else {
-        errors.push(`Cultural moments: ${validation.errors?.map((e) => e.message).join(', ')}`);
+        events.push(...convertCulturalMoments(validation.data, countryCode));
       }
-    } else {
-      // Cultural moments are optional
-      console.log(`Cultural moments file not found for ${year}`);
     }
   } catch (e) {
-    errors.push(`Failed to load cultural moments: ${e}`);
+    console.log(`No cultural moments for ${countryCode}/${year}`);
   }
 
-  try {
-    // Load seasons (evergreen)
-    const seasonsResponse = await fetch('/data/za/seasons.json');
-    if (seasonsResponse.ok) {
-      const seasonsData = await seasonsResponse.json();
-      const validation = validateSeasons(seasonsData);
-      if (validation.valid && validation.data) {
-        events.push(...convertSeasons(validation.data, year));
-      } else {
-        errors.push(`Seasons: ${validation.errors?.map((e) => e.message).join(', ')}`);
+  // Load seasons (only za has this currently)
+  if (countryCode === 'za') {
+    try {
+      const seasonsResponse = await fetch(`/data/${countryCode}/seasons.json`);
+      if (seasonsResponse.ok) {
+        const seasonsData = await seasonsResponse.json();
+        const validation = validateSeasons(seasonsData);
+        if (validation.valid && validation.data) {
+          events.push(...convertSeasons(validation.data, year, countryCode));
+        }
       }
+    } catch (e) {
+      console.log(`No seasons for ${countryCode}`);
     }
-  } catch (e) {
-    errors.push(`Failed to load seasons: ${e}`);
   }
 
   return { events, errors };
 }
 
-// Check if dataset exists for a year
+// Load data for multiple countries
+export async function loadMultiCountryDataset(countries: CountryCode[], year: number): Promise<{
+  events: CalendarEvent[];
+  errors: string[];
+}> {
+  const allEvents: CalendarEvent[] = [];
+  const allErrors: string[] = [];
+
+  // Load data for each country in parallel
+  const results = await Promise.all(
+    countries.map(country => loadCountryData(country, year))
+  );
+
+  results.forEach(result => {
+    allEvents.push(...result.events);
+    allErrors.push(...result.errors);
+  });
+
+  return { events: allEvents, errors: allErrors };
+}
+
+// Legacy function for backwards compatibility - loads SA data only
+export async function loadSADataset(year: number): Promise<{
+  events: CalendarEvent[];
+  errors: string[];
+}> {
+  return loadCountryData('za', year);
+}
+
+// Check if dataset exists for a year (legacy - SA only)
 export async function checkDatasetExists(year: number): Promise<{
   holidays: boolean;
   school: boolean;
@@ -246,4 +288,3 @@ export async function checkDatasetExists(year: number): Promise<{
     seasons: results[3],
   };
 }
-

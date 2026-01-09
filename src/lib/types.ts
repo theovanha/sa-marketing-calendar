@@ -48,12 +48,25 @@ export interface CalendarEvent {
   customColor?: string; // custom color for deadline events
 }
 
+// Available countries for key events
+export type CountryCode = 'global' | 'us' | 'uk' | 'au' | 'id' | 'za';
+
+export const COUNTRY_OPTIONS: { code: CountryCode; label: string; description: string }[] = [
+  { code: 'global', label: 'GLOBAL', description: 'International events & major sporting events' },
+  { code: 'us', label: 'USA', description: 'US federal holidays & cultural moments' },
+  { code: 'uk', label: 'UK', description: 'UK bank holidays & cultural moments' },
+  { code: 'au', label: 'AUSTRALIA', description: 'Australian public holidays & cultural moments' },
+  { code: 'id', label: 'INDONESIA', description: 'Indonesian public holidays & cultural moments' },
+  { code: 'za', label: 'SOUTH AFRICA', description: 'SA public holidays, school terms & cultural moments' },
+];
+
 export interface Brand {
   id: string;
   name: string;
   logo?: string;
   primaryColor: string;
   timezone: string; // default: "Africa/Johannesburg"
+  countries: CountryCode[]; // Countries for key events, default: ['za']
   archived?: boolean;
   createdAt: string;
 }

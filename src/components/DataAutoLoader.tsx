@@ -1,22 +1,27 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useAppStore, useGlobalEvents } from '@/lib/store';
-import { loadSADataset } from '@/lib/dataLoader';
+import { useAppStore, useGlobalEvents, useSelectedBrand } from '@/lib/store';
+import { loadMultiCountryDataset } from '@/lib/dataLoader';
+import { CountryCode } from '@/lib/types';
 
 /**
- * Auto-loads SA dataset and syncs with Supabase on app startup.
+ * Auto-loads country datasets based on selected brand's countries.
+ * Syncs with Supabase on app startup.
  */
 export function DataAutoLoader() {
   const { 
     importGlobalEvents, 
+    clearGlobalEvents,
     selectedYear, 
     initializeFromSupabase,
     isInitialized 
   } = useAppStore();
+  const selectedBrand = useSelectedBrand();
   const globalEvents = useGlobalEvents();
-  const hasLoadedSAData = useRef(false);
   const hasInitializedSupabase = useRef(false);
+  const lastLoadedCountries = useRef<string>('');
+  const lastLoadedYear = useRef<number>(0);
 
   // Initialize from Supabase on mount
   useEffect(() => {
@@ -26,45 +31,47 @@ export function DataAutoLoader() {
     initializeFromSupabase().catch(console.error);
   }, [initializeFromSupabase]);
 
-  // Load SA dataset after Supabase init
+  // Load country datasets after Supabase init, when brand or year changes
   useEffect(() => {
     if (!isInitialized) return;
-    if (hasLoadedSAData.current) return;
     
-    // Check if we already have global events for the current year
-    const hasEventsForYear = globalEvents.some((e) => 
-      e.startDate.startsWith(String(selectedYear))
-    );
+    // Get countries from selected brand, or default to 'za'
+    const countries: CountryCode[] = selectedBrand?.countries || ['za'];
+    const countriesKey = countries.sort().join(',');
     
-    if (hasEventsForYear) {
-      hasLoadedSAData.current = true;
+    // Skip if already loaded for same countries and year
+    if (countriesKey === lastLoadedCountries.current && selectedYear === lastLoadedYear.current) {
       return;
     }
 
-    // Load SA dataset
+    // Load country datasets
     const loadData = async () => {
-      hasLoadedSAData.current = true;
+      lastLoadedCountries.current = countriesKey;
+      lastLoadedYear.current = selectedYear;
       
-      // Load current year
-      const { events: currentYearEvents } = await loadSADataset(selectedYear);
+      // Clear existing global events before loading new ones
+      clearGlobalEvents();
+      
+      // Load current year for all selected countries
+      const { events: currentYearEvents } = await loadMultiCountryDataset(countries, selectedYear);
       
       // Also load next year if we're in Q4
       const currentMonth = new Date().getMonth();
       let allEvents = [...currentYearEvents];
       
       if (currentMonth >= 9) { // October onwards
-        const { events: nextYearEvents } = await loadSADataset(selectedYear + 1);
+        const { events: nextYearEvents } = await loadMultiCountryDataset(countries, selectedYear + 1);
         allEvents = [...allEvents, ...nextYearEvents];
       }
       
       if (allEvents.length > 0) {
         importGlobalEvents(allEvents);
-        console.log(`[DataAutoLoader] Loaded ${allEvents.length} SA events`);
+        console.log(`[DataAutoLoader] Loaded ${allEvents.length} events for countries: ${countriesKey}`);
       }
     };
 
     loadData();
-  }, [isInitialized, selectedYear, globalEvents, importGlobalEvents]);
+  }, [isInitialized, selectedYear, selectedBrand?.countries, importGlobalEvents, clearGlobalEvents]);
 
   // This component doesn't render anything
   return null;

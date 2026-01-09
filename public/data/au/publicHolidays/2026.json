@@ -1,0 +1,48 @@
+{
+  "year": 2026,
+  "country": "au",
+  "holidays": [
+    {
+      "title": "🇦🇺 Australia Day",
+      "startDate": "2026-01-26",
+      "importance": "high",
+      "tags": ["national holiday", "celebration"],
+      "notes": "Australia's national day"
+    },
+    {
+      "title": "🇦🇺 Good Friday",
+      "startDate": "2026-04-03",
+      "importance": "high",
+      "tags": ["public holiday", "easter"],
+      "notes": "Australian public holiday"
+    },
+    {
+      "title": "🇦🇺 Easter Monday",
+      "startDate": "2026-04-06",
+      "importance": "high",
+      "tags": ["public holiday", "easter"],
+      "notes": "Australian public holiday"
+    },
+    {
+      "title": "🇦🇺 ANZAC Day",
+      "startDate": "2026-04-25",
+      "importance": "high",
+      "tags": ["national holiday", "remembrance"],
+      "notes": "National day of remembrance in Australia and New Zealand"
+    },
+    {
+      "title": "🇦🇺 Queen's Birthday",
+      "startDate": "2026-06-08",
+      "importance": "med",
+      "tags": ["public holiday"],
+      "notes": "Queen's Birthday public holiday (varies by state)"
+    },
+    {
+      "title": "🇦🇺 Boxing Day",
+      "startDate": "2026-12-26",
+      "importance": "high",
+      "tags": ["public holiday", "retail", "sales"],
+      "notes": "Major retail sales day in Australia"
+    }
+  ]
+}

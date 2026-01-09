@@ -1,0 +1,101 @@
+{
+  "year": 2026,
+  "country": "us",
+  "moments": [
+    {
+      "title": "🏈 NFL Playoffs Begin",
+      "startDate": "2026-01-10",
+      "importance": "high",
+      "tags": ["sport", "american football", "nfl"],
+      "notes": "NFL Wild Card Weekend - start of playoff season"
+    },
+    {
+      "title": "🏀 March Madness Begins",
+      "startDate": "2026-03-17",
+      "endDate": "2026-04-06",
+      "importance": "high",
+      "tags": ["sport", "basketball", "ncaa", "college"],
+      "notes": "NCAA Men's Basketball Tournament - massive engagement and bracket pools"
+    },
+    {
+      "title": "⚾ MLB Opening Day",
+      "startDate": "2026-03-26",
+      "importance": "high",
+      "tags": ["sport", "baseball", "mlb"],
+      "notes": "Start of Major League Baseball season"
+    },
+    {
+      "title": "🏀 NBA Playoffs Begin",
+      "startDate": "2026-04-18",
+      "importance": "high",
+      "tags": ["sport", "basketball", "nba"],
+      "notes": "Start of NBA playoff season"
+    },
+    {
+      "title": "🏒 NHL Stanley Cup Playoffs Begin",
+      "startDate": "2026-04-18",
+      "importance": "med",
+      "tags": ["sport", "hockey", "nhl"],
+      "notes": "Start of NHL Stanley Cup playoffs"
+    },
+    {
+      "title": "🏇 Kentucky Derby",
+      "startDate": "2026-05-02",
+      "importance": "med",
+      "tags": ["sport", "horse racing"],
+      "notes": "The most famous horse race in America - Run for the Roses"
+    },
+    {
+      "title": "🏎️ Indianapolis 500",
+      "startDate": "2026-05-24",
+      "importance": "med",
+      "tags": ["sport", "motorsport", "indycar"],
+      "notes": "The Greatest Spectacle in Racing - Indianapolis Motor Speedway"
+    },
+    {
+      "title": "🏀 NBA Finals",
+      "startDate": "2026-06-04",
+      "endDate": "2026-06-21",
+      "importance": "high",
+      "tags": ["sport", "basketball", "nba", "finals"],
+      "notes": "NBA Championship series"
+    },
+    {
+      "title": "🏒 NHL Stanley Cup Finals",
+      "startDate": "2026-06-01",
+      "endDate": "2026-06-20",
+      "importance": "med",
+      "tags": ["sport", "hockey", "nhl", "finals"],
+      "notes": "NHL Stanley Cup Championship series"
+    },
+    {
+      "title": "⚾ MLB All-Star Game",
+      "startDate": "2026-07-14",
+      "importance": "med",
+      "tags": ["sport", "baseball", "mlb", "all-star"],
+      "notes": "MLB Midsummer Classic"
+    },
+    {
+      "title": "🏈 NFL Season Kickoff",
+      "startDate": "2026-09-10",
+      "importance": "high",
+      "tags": ["sport", "american football", "nfl"],
+      "notes": "Start of NFL regular season - America's most watched sport"
+    },
+    {
+      "title": "⚾ MLB World Series",
+      "startDate": "2026-10-23",
+      "endDate": "2026-11-01",
+      "importance": "high",
+      "tags": ["sport", "baseball", "mlb", "world series"],
+      "notes": "MLB Championship - Fall Classic"
+    },
+    {
+      "title": "🏀 NBA Season Tipoff",
+      "startDate": "2026-10-20",
+      "importance": "high",
+      "tags": ["sport", "basketball", "nba"],
+      "notes": "Start of NBA regular season"
+    }
+  ]
+}
