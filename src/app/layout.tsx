@@ -6,8 +6,8 @@ import { DebugPanel } from '@/components/DebugPanel';
 import { InteractionDebugger } from '@/components/InteractionDebugger';
 
 export const metadata: Metadata = {
-  title: 'SA Marketing Calendar',
-  description: '12-month South African performance marketing calendar for agencies',
+  title: 'VANHA Marketing Calendar',
+  description: 'Performance Marketing + Design Studio - 12-month marketing calendar for agencies',
 };
 
 export default function RootLayout({
