@@ -36,9 +36,11 @@ export function BrandCard({ brand }: BrandCardProps) {
 
   return (
     <div
+      onClick={brand.archived ? undefined : handleOpen}
       className={cn(
         'card card-hover p-5 relative group',
-        brand.archived && 'opacity-60'
+        brand.archived && 'opacity-60',
+        !brand.archived && 'cursor-pointer'
       )}
     >
       {/* Brand color indicator */}
@@ -77,7 +79,10 @@ export function BrandCard({ brand }: BrandCardProps) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setShowMenu(!showMenu)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowMenu(!showMenu);
+            }}
             className="opacity-0 group-hover:opacity-100"
           >
             <MoreVertical className="w-4 h-4" />
@@ -113,7 +118,10 @@ export function BrandCard({ brand }: BrandCardProps) {
       <Button
         variant="secondary"
         size="sm"
-        onClick={handleOpen}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleOpen();
+        }}
         className="w-full mt-4"
         disabled={brand.archived}
       >

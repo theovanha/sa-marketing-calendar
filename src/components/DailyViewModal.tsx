@@ -1,9 +1,10 @@
 'use client';
 
 import { useMemo, useState, useRef, useEffect, DragEvent } from 'react';
-import { X, GripVertical } from 'lucide-react';
+import { X, GripVertical, Flag, GraduationCap, Sun, Target, Rocket, Clock } from 'lucide-react';
 import { CalendarEvent, EventType } from '@/lib/types';
-import { MONTH_NAMES, DEADLINE_COLORS, cn } from '@/lib/utils';
+import { MONTH_NAMES, DEADLINE_COLORS, cn, filterEvents } from '@/lib/utils';
+import { FilterChip } from './ui';
 import { useAppStore } from '@/lib/store';
 import { debugLog } from './InteractionDebugger';
 import {
@@ -12,6 +13,7 @@ import {
   startOfWeek,
   endOfWeek,
   eachDayOfInterval,
+  addDays,
   format,
   isSameMonth,
   isWeekend,
@@ -357,8 +359,18 @@ function AddEventPopup({ dateStr, onClose, onAdd }: AddEventPopupProps) {
   );
 }
 
+// Filter items for the toggle chips (same as TopBar)
+const filterItems = [
+  { key: 'keyDates' as const, label: 'Key Dates', icon: Flag, color: '#00F59B' },
+  { key: 'school' as const, label: 'School', icon: GraduationCap, color: '#8B5CF6' },
+  { key: 'seasons' as const, label: 'Seasons', icon: Sun, color: '#22D3EE' },
+  { key: 'brandDates' as const, label: 'Brand', icon: Target, color: '#FFFFFF' },
+  { key: 'campaignFlights' as const, label: 'Campaigns', icon: Rocket, color: '#FFFFFF' },
+  { key: 'deadlines' as const, label: 'Deadlines', icon: Clock, color: '#ef4444' },
+];
+
 export function DailyViewModal({ month, year, events, onClose }: DailyViewModalProps) {
-  const { selectedBrandId, createEvent, updateEvent } = useAppStore();
+  const { selectedBrandId, createEvent, updateEvent, filters, toggleFilter } = useAppStore();
   const monthDate = new Date(year, month, 1);
   const [addingToDate, setAddingToDate] = useState<string | null>(null);
   const [dragOverDate, setDragOverDate] = useState<string | null>(null);
@@ -468,7 +480,9 @@ export function DailyViewModal({ month, year, events, onClose }: DailyViewModalP
   };
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>, dateStr: string, inCurrentMonth: boolean, weekEl?: HTMLElement | null, weekIdx?: number) => {
-    if (!inCurrentMonth || (!draggedEvent && !extendingEvent)) return;
+    // Block if no drag operation, or if moving (not extending) to outside current month
+    // Allow extending to any visible date (including next month)
+    if ((!draggedEvent && !extendingEvent) || (draggedEvent && !inCurrentMonth)) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     
@@ -520,10 +534,11 @@ export function DailyViewModal({ month, year, events, onClose }: DailyViewModalP
     setWeekContainerRect(null);
     setCurrentDragWeekIndex(null);
     
-    if (!inCurrentMonth) {
-      debugLog('state-change', 'Drop ignored - not in current month');
+    // Only block drops outside current month for move operations (not extend)
+    // Allow extending events to any visible date (including next month)
+    if (!inCurrentMonth && !extendingEvent) {
+      debugLog('state-change', 'Drop ignored - not in current month (move operation)');
       setDraggedEvent(null);
-      setExtendingEvent(null);
       return;
     }
     
@@ -596,14 +611,27 @@ export function DailyViewModal({ month, year, events, onClose }: DailyViewModalP
   };
 
   // Calculate calendar grid days (including days from prev/next months to fill the grid)
+  // Always show 6 weeks (42 days) to allow dragging events to next month
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(monthDate);
     const monthEnd = endOfMonth(monthDate);
     // Start from Monday
     const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
     const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
-
-    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+    
+    // Calculate days in current range
+    const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+    
+    // Extend to 6 weeks (42 days) if needed for drag-to-next-month functionality
+    if (days.length < 42) {
+      const lastDay = days[days.length - 1];
+      const daysToAdd = 42 - days.length;
+      for (let i = 1; i <= daysToAdd; i++) {
+        days.push(addDays(lastDay, i));
+      }
+    }
+    
+    return days;
   }, [month, year]);
 
   // Group days into weeks for row-based rendering
@@ -615,12 +643,17 @@ export function DailyViewModal({ month, year, events, onClose }: DailyViewModalP
     return result;
   }, [calendarDays]);
 
+  // Apply filters to events
+  const filteredEvents = useMemo(() => {
+    return filterEvents(events, filters);
+  }, [events, filters]);
+
   // Separate multi-day and single-day events
   const { multiDayEvents, singleDayEvents } = useMemo(() => {
     const multiDay: CalendarEvent[] = [];
     const singleDay: CalendarEvent[] = [];
     
-    events.forEach((event) => {
+    filteredEvents.forEach((event) => {
       if (event.endDate && event.endDate !== event.startDate) {
         multiDay.push(event);
       } else {
@@ -629,7 +662,7 @@ export function DailyViewModal({ month, year, events, onClose }: DailyViewModalP
     });
     
     return { multiDayEvents: multiDay, singleDayEvents: singleDay };
-  }, [events]);
+  }, [filteredEvents]);
 
   // Group single-day events by date
   const eventsByDate = useMemo(() => {
@@ -737,16 +770,30 @@ export function DailyViewModal({ month, year, events, onClose }: DailyViewModalP
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-surface-800">
-          <h2 className="text-xl font-bold text-white">
-            {monthName} {year}
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-2 text-surface-400 hover:text-white hover:bg-surface-800 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+        <div className="px-6 py-4 border-b border-surface-800">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xl font-bold text-white">
+              {monthName} {year}
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-2 text-surface-400 hover:text-white hover:bg-surface-800 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          {/* Filter toggles */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {filterItems.map(({ key, label, color }) => (
+              <FilterChip
+                key={key}
+                label={label}
+                active={filters[key]}
+                onClick={() => toggleFilter(key)}
+                color={color}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Calendar Grid */}
@@ -799,7 +846,9 @@ export function DailyViewModal({ month, year, events, onClose }: DailyViewModalP
                             'min-h-[100px] p-2 rounded-lg border transition-colors relative',
                             inCurrentMonth ? 'border-surface-800 hover:border-surface-600 cursor-pointer' : 'border-transparent',
                             weekend && inCurrentMonth && 'bg-surface-800/50',
-                            !inCurrentMonth && 'opacity-30',
+                            // Dim next-month dates, but make them visible when extending
+                            !inCurrentMonth && !extendingEvent && 'opacity-30',
+                            !inCurrentMonth && extendingEvent && 'opacity-60 cursor-pointer',
                             today && 'ring-1 ring-[#00F59B]',
                             isDragOver && draggedEvent && 'ring-2 ring-[#00F59B] bg-[#00F59B]/10',
                             isDragOver && extendingEvent && 'ring-2 ring-blue-400 bg-blue-400/10'

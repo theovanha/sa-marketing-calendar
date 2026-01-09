@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { X, Upload, Check } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { Brand } from '@/lib/types';
@@ -14,9 +14,19 @@ interface BrandSettingsModalProps {
 
 export function BrandSettingsModal({ brand, open, onClose }: BrandSettingsModalProps) {
   const { updateBrand } = useAppStore();
+  const [brandName, setBrandName] = useState(brand.name);
   const [selectedColor, setSelectedColor] = useState(brand.primaryColor);
   const [logoPreview, setLogoPreview] = useState(brand.logo || '');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync state when modal opens or brand changes
+  useEffect(() => {
+    if (open) {
+      setBrandName(brand.name);
+      setSelectedColor(brand.primaryColor);
+      setLogoPreview(brand.logo || '');
+    }
+  }, [open, brand]);
 
   if (!open) return null;
 
@@ -50,7 +60,9 @@ export function BrandSettingsModal({ brand, open, onClose }: BrandSettingsModalP
   };
 
   const handleSave = () => {
+    if (!brandName.trim()) return; // Don't save empty name
     updateBrand(brand.id, {
+      name: brandName.trim(),
       primaryColor: selectedColor,
       logo: logoPreview || undefined,
     });
@@ -84,6 +96,20 @@ export function BrandSettingsModal({ brand, open, onClose }: BrandSettingsModalP
 
           {/* Content */}
           <div className="px-5 py-4 space-y-6">
+            {/* Brand Name Section */}
+            <div>
+              <label className="block text-sm font-medium text-surface-300 mb-2">
+                Brand Name
+              </label>
+              <input
+                type="text"
+                value={brandName}
+                onChange={(e) => setBrandName(e.target.value)}
+                className="w-full px-3 py-2 bg-surface-800 border border-surface-700 rounded-lg text-white placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-[#00F59B] focus:border-transparent"
+                placeholder="Enter brand name"
+              />
+            </div>
+
             {/* Logo Section */}
             <div>
               <label className="block text-sm font-medium text-surface-300 mb-3">
