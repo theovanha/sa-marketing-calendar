@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calendar, Archive, Trash2, MoreVertical } from 'lucide-react';
+import { Calendar, Archive, Trash2, MoreVertical, Settings } from 'lucide-react';
 import { Brand } from '@/lib/types';
 import { useAppStore } from '@/lib/store';
 import { Button } from './ui';
+import { BrandSettingsModal } from './BrandSettingsModal';
 import { cn } from '@/lib/utils';
 
 interface BrandCardProps {
@@ -15,6 +16,7 @@ interface BrandCardProps {
 export function BrandCard({ brand }: BrandCardProps) {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const { selectBrand, archiveBrand, deleteBrand } = useAppStore();
 
   const handleOpen = () => {
@@ -92,6 +94,17 @@ export function BrandCard({ brand }: BrandCardProps) {
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
               <div className="absolute right-0 top-full mt-1 z-20 bg-surface-800 border border-surface-700 rounded-lg shadow-xl py-1 min-w-[140px]">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMenu(false);
+                    setShowSettings(true);
+                  }}
+                  className="w-full px-3 py-2 text-left text-sm text-surface-300 hover:bg-surface-700 flex items-center gap-2"
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </button>
                 {!brand.archived && (
                   <button
                     onClick={handleArchive}
@@ -128,6 +141,13 @@ export function BrandCard({ brand }: BrandCardProps) {
         <Calendar className="w-4 h-4" />
         Open Calendar
       </Button>
+
+      {/* Brand settings modal */}
+      <BrandSettingsModal
+        brand={brand}
+        open={showSettings}
+        onClose={() => setShowSettings(false)}
+      />
     </div>
   );
 }
