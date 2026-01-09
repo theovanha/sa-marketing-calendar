@@ -31,6 +31,7 @@ export const brandService = {
       logo: b.logo || undefined,
       primaryColor: b.primary_color,
       timezone: b.timezone,
+      countries: b.countries || ['za'],
       archived: b.archived,
       createdAt: b.created_at,
     }));
@@ -50,6 +51,7 @@ export const brandService = {
       logo: brand.logo || null,
       primary_color: brand.primaryColor,
       timezone: brand.timezone,
+      countries: brand.countries || ['za'],
       archived: brand.archived || false,
       created_at: brand.createdAt,
     });
@@ -65,6 +67,7 @@ export const brandService = {
     if (updates.name !== undefined) dbUpdates.name = updates.name;
     if (updates.logo !== undefined) dbUpdates.logo = updates.logo || null;
     if (updates.primaryColor !== undefined) dbUpdates.primary_color = updates.primaryColor;
+    if (updates.countries !== undefined) dbUpdates.countries = updates.countries;
     if (updates.archived !== undefined) dbUpdates.archived = updates.archived;
     
     const { error } = await supabase.from('brands').update(dbUpdates).eq('id', id);
