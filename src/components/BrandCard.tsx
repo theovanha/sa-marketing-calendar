@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calendar, Archive, Trash2, MoreVertical, Settings } from 'lucide-react';
+import { Calendar, Archive, Trash2, MoreVertical, Settings, Link, Check } from 'lucide-react';
 import { Brand } from '@/lib/types';
 import { useAppStore } from '@/lib/store';
 import { Button } from './ui';
@@ -17,11 +17,23 @@ export function BrandCard({ brand }: BrandCardProps) {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const { selectBrand, archiveBrand, deleteBrand } = useAppStore();
 
   const handleOpen = () => {
     selectBrand(brand.id);
     router.push(`/brand/${brand.id}`);
+  };
+
+  const handleCopyClientLink = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const clientUrl = `${window.location.origin}/client/${brand.id}`;
+    await navigator.clipboard.writeText(clientUrl);
+    setLinkCopied(true);
+    setTimeout(() => {
+      setLinkCopied(false);
+      setShowMenu(false);
+    }, 1500);
   };
 
   const handleArchive = () => {
@@ -93,7 +105,23 @@ export function BrandCard({ brand }: BrandCardProps) {
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-full mt-1 z-20 bg-surface-800 border border-surface-700 rounded-lg shadow-xl py-1 min-w-[140px]">
+              <div className="absolute right-0 top-full mt-1 z-20 bg-surface-800 border border-surface-700 rounded-lg shadow-xl py-1 min-w-[160px]">
+                <button
+                  onClick={handleCopyClientLink}
+                  className="w-full px-3 py-2 text-left text-sm text-surface-300 hover:bg-surface-700 flex items-center gap-2"
+                >
+                  {linkCopied ? (
+                    <>
+                      <Check className="w-4 h-4" style={{ color: '#00F59B' }} />
+                      <span style={{ color: '#00F59B' }}>Link Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Link className="w-4 h-4" />
+                      Copy Client Link
+                    </>
+                  )}
+                </button>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
