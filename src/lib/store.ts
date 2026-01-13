@@ -494,12 +494,9 @@ export const useAppStore = create<AppState>()(
       name: 'sa-marketing-calendar-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        // Exclude logos from localStorage to stay under 5MB limit
-        // Logos are synced to Supabase and loaded from there
-        brands: state.brands.map(b => ({ ...b, logo: undefined })),
-        events: state.events,
-        monthNotes: state.monthNotes,
-        hiddenEventsByBrand: state.hiddenEventsByBrand,
+        // ONLY store simple UI preferences locally
+        // All important data (brands, events, notes) lives in Supabase
+        // This prevents localStorage quota issues and silent data loss
         selectedBrandId: state.selectedBrandId,
         selectedYear: state.selectedYear,
         filters: state.filters,
