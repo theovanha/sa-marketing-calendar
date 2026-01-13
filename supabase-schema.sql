@@ -10,9 +10,14 @@ CREATE TABLE brands (
   logo TEXT,
   primary_color TEXT NOT NULL DEFAULT '#6b7280',
   timezone TEXT NOT NULL DEFAULT 'Africa/Johannesburg',
+  countries TEXT[] NOT NULL DEFAULT '{za}',
   archived BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Migration: Add countries column to existing brands table
+-- Run this if table already exists:
+-- ALTER TABLE brands ADD COLUMN IF NOT EXISTS countries TEXT[] NOT NULL DEFAULT '{za}';
 
 -- Events table (both global SA events and brand-specific)
 CREATE TABLE events (

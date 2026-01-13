@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { Brand, CalendarEvent, FilterState, CountryCode } from './types';
+import type { Brand, CalendarEvent, FilterState } from './types';
 import { generateId } from './utils';
 import { 
   brandService, 
@@ -47,7 +47,7 @@ interface AppState {
   initializeFromSupabase: () => Promise<void>;
   
   // Brand Actions
-  createBrand: (name: string, countries?: CountryCode[]) => Promise<Brand>;
+  createBrand: (name: string) => Promise<Brand>;
   updateBrand: (id: string, updates: Partial<Brand>) => Promise<void>;
   archiveBrand: (id: string) => Promise<void>;
   deleteBrand: (id: string) => Promise<void>;
@@ -60,7 +60,6 @@ interface AppState {
   hideEventForBrand: (eventId: string, brandId: string) => Promise<void>;
   unhideEventForBrand: (eventId: string, brandId: string) => Promise<void>;
   isEventHiddenForBrand: (eventId: string, brandId: string) => boolean;
-  clearHiddenEventsForCountry: (brandId: string, countryCode: string) => Promise<void>;
   selectEvent: (id: string | null) => void;
   
   // Undo Actions
@@ -153,13 +152,12 @@ export const useAppStore = create<AppState>()(
       },
       
       // Brand Actions
-      createBrand: async (name: string, countries: CountryCode[] = ['za']) => {
+      createBrand: async (name: string) => {
         const newBrand: Brand = {
           id: generateId(),
           name,
           primaryColor: '#6b7280',
           timezone: 'Africa/Johannesburg',
-          countries,
           createdAt: new Date().toISOString(),
         };
         
@@ -349,33 +347,6 @@ export const useAppStore = create<AppState>()(
         return hiddenEvents.includes(eventId);
       },
       
-      clearHiddenEventsForCountry: async (brandId, countryCode) => {
-        // Clear hidden events that match the country code prefix
-        set((state) => {
-          const currentHidden = state.hiddenEventsByBrand[brandId] || [];
-          const filteredHidden = currentHidden.filter(
-            (eventId) => !eventId.startsWith(`${countryCode}-`)
-          );
-          return {
-            hiddenEventsByBrand: {
-              ...state.hiddenEventsByBrand,
-              [brandId]: filteredHidden,
-            },
-          };
-        });
-        
-        // Sync to Supabase - unhide all events for this country
-        try {
-          const currentHidden = get().hiddenEventsByBrand[brandId] || [];
-          const countryEvents = currentHidden.filter((id) => id.startsWith(`${countryCode}-`));
-          await Promise.all(
-            countryEvents.map((eventId) => hiddenEventService.unhide(brandId, eventId))
-          );
-        } catch (error) {
-          console.error('Failed to sync cleared hidden events to Supabase:', error);
-        }
-      },
-      
       selectEvent: (id) => {
         set({ selectedEventId: id });
       },
@@ -494,9 +465,7 @@ export const useAppStore = create<AppState>()(
       name: 'sa-marketing-calendar-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        // Exclude logos from localStorage to stay under 5MB limit
-        // Logos are synced to Supabase and loaded from there
-        brands: state.brands.map(b => ({ ...b, logo: undefined })),
+        brands: state.brands,
         events: state.events,
         monthNotes: state.monthNotes,
         hiddenEventsByBrand: state.hiddenEventsByBrand,
