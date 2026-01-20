@@ -107,6 +107,7 @@ export const eventService = {
       notes: e.notes || undefined,
       links: e.links || undefined,
       recurrence: e.recurrence || undefined,
+      customColor: e.custom_color || undefined,
     }));
   },
 
@@ -127,6 +128,7 @@ export const eventService = {
       notes: event.notes || null,
       links: event.links || null,
       recurrence: event.recurrence || null,
+      custom_color: event.customColor || null,
     });
     if (error) throw error;
   },
@@ -144,6 +146,7 @@ export const eventService = {
     if (updates.channels !== undefined) dbUpdates.channels = updates.channels || null;
     if (updates.objective !== undefined) dbUpdates.objective = updates.objective || null;
     if (updates.notes !== undefined) dbUpdates.notes = updates.notes || null;
+    if (updates.customColor !== undefined) dbUpdates.custom_color = updates.customColor || null;
     
     const { error } = await supabase.from('events').update(dbUpdates).eq('id', id);
     if (error) throw error;

@@ -23,6 +23,7 @@ interface AppState {
   events: CalendarEvent[];
   monthNotes: Record<string, string>;
   hiddenEventsByBrand: Record<string, string[]>;
+  noteHeights: Record<string, number>; // Persist notes textarea heights
   
   // Sync state
   isLoading: boolean;
@@ -82,6 +83,10 @@ interface AppState {
   // Month notes
   setMonthNote: (brandId: string | null, year: number, month: number, note: string) => Promise<void>;
   getMonthNote: (brandId: string | null, year: number, month: number) => string;
+  
+  // Note heights persistence
+  setNoteHeight: (brandId: string | null, year: number, month: number, height: number) => void;
+  getNoteHeight: (brandId: string | null, year: number, month: number) => number | undefined;
 }
 
 const DEFAULT_FILTERS: FilterState = {
@@ -101,6 +106,7 @@ export const useAppStore = create<AppState>()(
       events: [],
       monthNotes: {},
       hiddenEventsByBrand: {},
+      noteHeights: {},
       isLoading: false,
       isInitialized: false,
       syncError: null,
@@ -489,6 +495,22 @@ export const useAppStore = create<AppState>()(
         const key = `${brandId || 'global'}-${year}-${month}`;
         return get().monthNotes[key] || '';
       },
+      
+      // Note heights persistence
+      setNoteHeight: (brandId, year, month, height) => {
+        const key = `${brandId || 'global'}-${year}-${month}`;
+        set((state) => ({
+          noteHeights: {
+            ...state.noteHeights,
+            [key]: height,
+          },
+        }));
+      },
+      
+      getNoteHeight: (brandId, year, month) => {
+        const key = `${brandId || 'global'}-${year}-${month}`;
+        return get().noteHeights[key];
+      },
     }),
     {
       name: 'sa-marketing-calendar-storage',
@@ -500,6 +522,7 @@ export const useAppStore = create<AppState>()(
         selectedBrandId: state.selectedBrandId,
         selectedYear: state.selectedYear,
         filters: state.filters,
+        noteHeights: state.noteHeights, // Persist note textarea heights locally
       }),
     }
   )

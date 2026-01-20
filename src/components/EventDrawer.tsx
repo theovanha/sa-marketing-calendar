@@ -36,6 +36,8 @@ import { findPlanningPrompt, calculateCampaignDates } from '@/lib/planningPrompt
 const EVENT_TYPES: { value: EventType; label: string }[] = [
   { value: 'brandMoment', label: 'Brand Moment' },
   { value: 'campaignFlight', label: 'Campaign Flight' },
+  { value: 'deadline', label: 'Deadline' },
+  { value: 'keyDate', label: 'Key Date' },
   { value: 'publicHoliday', label: 'Public Holiday' },
   { value: 'schoolTerm', label: 'School Term' },
   { value: 'backToSchool', label: 'Back to School' },

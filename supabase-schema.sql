@@ -35,8 +35,13 @@ CREATE TABLE events (
   notes TEXT,
   links JSONB,
   recurrence JSONB,
+  custom_color TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Migration: Add custom_color column to existing events table
+-- Run this if table already exists:
+-- ALTER TABLE events ADD COLUMN IF NOT EXISTS custom_color TEXT;
 
 -- Hidden events per brand (when user hides a global event for their brand)
 CREATE TABLE hidden_events (

@@ -7,6 +7,7 @@ import { MONTH_NAMES, DEADLINE_COLORS, cn, filterEvents } from '@/lib/utils';
 import { FilterChip } from './ui';
 import { useAppStore } from '@/lib/store';
 import { debugLog } from './InteractionDebugger';
+import { EditEventModal } from './EditEventModal';
 import {
   startOfMonth,
   endOfMonth,
@@ -27,14 +28,14 @@ interface DailyViewModalProps {
   onClose: () => void;
 }
 
-// Event type options for pill selector
+// Event type options for pill selector (Brand first, then Campaign, then Deadline)
 const EVENT_TYPE_OPTIONS: { value: EventType; label: string; highlighted: boolean; hasColor?: boolean }[] = [
-  { value: 'keyDate', label: 'Key Date', highlighted: false },
-  { value: 'schoolTerm', label: 'School', highlighted: false },
-  { value: 'season', label: 'Season', highlighted: false },
   { value: 'brandMoment', label: 'Brand', highlighted: true },
   { value: 'campaignFlight', label: 'Campaign', highlighted: true },
   { value: 'deadline', label: 'Deadline', highlighted: false, hasColor: true },
+  { value: 'keyDate', label: 'Key Date', highlighted: false },
+  { value: 'schoolTerm', label: 'School', highlighted: false },
+  { value: 'season', label: 'Season', highlighted: false },
 ];
 
 // Check if event type supports extending (multi-day)
@@ -46,9 +47,10 @@ interface DayEventPillProps {
   event: CalendarEvent;
   onDragStart: (e: DragEvent<HTMLDivElement>, event: CalendarEvent) => void;
   onExtendStart: (e: DragEvent<HTMLDivElement>, event: CalendarEvent) => void;
+  onEditEvent: (event: CalendarEvent) => void;
 }
 
-function DayEventPill({ event, onDragStart, onExtendStart }: DayEventPillProps) {
+function DayEventPill({ event, onDragStart, onExtendStart, onEditEvent }: DayEventPillProps) {
   const [showTooltip, setShowTooltip] = useState(false);
   
   const isBrandMoment = event.type === 'brandMoment';
@@ -92,6 +94,11 @@ function DayEventPill({ event, onDragStart, onExtendStart }: DayEventPillProps) 
     ? `${format(new Date(event.startDate), 'd')} - ${format(new Date(event.endDate!), 'd MMM')}`
     : null;
 
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onEditEvent(event);
+  };
+
   return (
     <div 
       className="relative group"
@@ -99,10 +106,11 @@ function DayEventPill({ event, onDragStart, onExtendStart }: DayEventPillProps) 
       onMouseLeave={() => setShowTooltip(false)}
       draggable
       onDragStart={(e) => onDragStart(e, event)}
+      onDoubleClick={handleDoubleClick}
     >
       <div
         className={cn(
-          "px-1.5 py-0.5 rounded text-[10px] leading-tight cursor-grab active:cursor-grabbing overflow-hidden flex items-center gap-1",
+          "px-1.5 py-1 rounded text-[10px] leading-tight cursor-grab active:cursor-grabbing overflow-hidden flex items-center gap-1",
           isHighlighted && "font-semibold shadow-sm"
         )}
         style={{ 
@@ -111,9 +119,10 @@ function DayEventPill({ event, onDragStart, onExtendStart }: DayEventPillProps) 
           borderLeft: borderColor ? `2px solid ${borderColor}` : undefined,
           boxShadow: isHighlighted ? '0 1px 3px rgba(255,255,255,0.2)' : undefined
         }}
+        title="Double-click to edit"
       >
         <GripVertical className="w-2 h-2 opacity-40 shrink-0" />
-        <span className="line-clamp-1 flex-1">{event.title}</span>
+        <span className="line-clamp-2 flex-1 break-words">{event.title}</span>
         {isMultiDay && (
           <span className="text-[8px] opacity-60 shrink-0">{dateDisplay}</span>
         )}
@@ -136,11 +145,12 @@ function DayEventPill({ event, onDragStart, onExtendStart }: DayEventPillProps) 
         />
       )}
       
-      {/* Tooltip on hover */}
+      {/* Enhanced tooltip on hover - shows full event name */}
       {showTooltip && (
-        <div className="absolute z-50 left-0 bottom-full mb-1 px-2 py-1 bg-surface-800 border border-surface-700 rounded shadow-lg text-xs text-white whitespace-nowrap">
-          {event.title}
-          {isMultiDay && <span className="text-surface-400 ml-1">({dateDisplay})</span>}
+        <div className="absolute z-50 left-0 bottom-full mb-1 px-2 py-1.5 bg-surface-800 border border-surface-700 rounded shadow-lg text-xs text-white max-w-[200px]">
+          <div className="font-medium break-words">{event.title}</div>
+          {isMultiDay && <div className="text-surface-400 text-[10px] mt-0.5">{dateDisplay}</div>}
+          <div className="text-surface-500 text-[10px] mt-0.5">Double-click to edit</div>
         </div>
       )}
     </div>
@@ -302,7 +312,7 @@ function AddEventPopup({ dateStr, onClose, onAdd }: AddEventPopupProps) {
                     type="date"
                     value={dateStr}
                     disabled
-                    className="w-full text-sm bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-surface-400"
+                    className="w-full text-sm bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-surface-400 [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-50"
                   />
                 </div>
                 <div className="text-surface-500 pt-5">→</div>
@@ -313,7 +323,7 @@ function AddEventPopup({ dateStr, onClose, onAdd }: AddEventPopupProps) {
                     value={endDate}
                     min={dateStr}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full text-sm bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#00F59B]"
+                    className="w-full text-sm bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#00F59B] [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:hover:opacity-100"
                   />
                 </div>
               </div>
@@ -359,20 +369,21 @@ function AddEventPopup({ dateStr, onClose, onAdd }: AddEventPopupProps) {
   );
 }
 
-// Filter items for the toggle chips (same as TopBar)
+// Filter items for the toggle chips (same as TopBar) - Brand, Campaign, Deadline first
 const filterItems = [
-  { key: 'keyDates' as const, label: 'Key Dates', icon: Flag, color: '#00F59B' },
-  { key: 'school' as const, label: 'School', icon: GraduationCap, color: '#8B5CF6' },
-  { key: 'seasons' as const, label: 'Seasons', icon: Sun, color: '#22D3EE' },
   { key: 'brandDates' as const, label: 'Brand', icon: Target, color: '#FFFFFF' },
   { key: 'campaignFlights' as const, label: 'Campaigns', icon: Rocket, color: '#FFFFFF' },
   { key: 'deadlines' as const, label: 'Deadlines', icon: Clock, color: '#ef4444' },
+  { key: 'keyDates' as const, label: 'Key Dates', icon: Flag, color: '#00F59B' },
+  { key: 'school' as const, label: 'School', icon: GraduationCap, color: '#8B5CF6' },
+  { key: 'seasons' as const, label: 'Seasons', icon: Sun, color: '#22D3EE' },
 ];
 
 export function DailyViewModal({ month, year, events, onClose }: DailyViewModalProps) {
   const { selectedBrandId, createEvent, updateEvent, filters, toggleFilter } = useAppStore();
   const monthDate = new Date(year, month, 1);
   const [addingToDate, setAddingToDate] = useState<string | null>(null);
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [dragOverDate, setDragOverDate] = useState<string | null>(null);
   const [draggedEvent, setDraggedEvent] = useState<CalendarEvent | null>(null);
   const [extendingEvent, setExtendingEvent] = useState<CalendarEvent | null>(null);
@@ -424,8 +435,7 @@ export function DailyViewModal({ month, year, events, onClose }: DailyViewModalP
     return null;
   }, [extendingEvent, draggedEvent, dragOverDate]);
 
-  const handleDoubleClick = (dateStr: string, inCurrentMonth: boolean) => {
-    if (!inCurrentMonth) return;
+  const handleDoubleClick = (dateStr: string) => {
     setAddingToDate(dateStr);
   };
 
@@ -834,7 +844,7 @@ export function DailyViewModal({ month, year, events, onClose }: DailyViewModalP
                       return (
                         <div
                           key={dateStr}
-                          onDoubleClick={() => handleDoubleClick(dateStr, inCurrentMonth)}
+                          onDoubleClick={() => handleDoubleClick(dateStr)}
                           onDragOver={(e) => {
                             const weekGrid = e.currentTarget.closest('.week-grid') as HTMLElement;
                             handleDragOver(e, dateStr, inCurrentMonth, weekGrid, weekIndex);
@@ -843,26 +853,28 @@ export function DailyViewModal({ month, year, events, onClose }: DailyViewModalP
                           onDrop={(e) => handleDrop(e, dateStr, inCurrentMonth)}
                           onDragEnd={handleDragEnd}
                           className={cn(
-                            'min-h-[100px] p-2 rounded-lg border transition-colors relative',
-                            inCurrentMonth ? 'border-surface-800 hover:border-surface-600 cursor-pointer' : 'border-transparent',
-                            weekend && inCurrentMonth && 'bg-surface-800/50',
-                            // Dim next-month dates, but make them visible when extending
-                            !inCurrentMonth && !extendingEvent && 'opacity-30',
-                            !inCurrentMonth && extendingEvent && 'opacity-60 cursor-pointer',
+                            'min-h-[100px] p-2 rounded-lg border transition-colors relative cursor-pointer',
+                            inCurrentMonth ? 'border-surface-800 hover:border-surface-600' : 'border-surface-800/50 hover:border-surface-600',
+                            weekend && 'bg-surface-800/50',
+                            // Slightly dim prev/next month dates but keep them interactive
+                            !inCurrentMonth && 'opacity-60',
                             today && 'ring-1 ring-[#00F59B]',
                             isDragOver && draggedEvent && 'ring-2 ring-[#00F59B] bg-[#00F59B]/10',
                             isDragOver && extendingEvent && 'ring-2 ring-blue-400 bg-blue-400/10'
                           )}
-                          title={inCurrentMonth ? 'Double-click to add event' : undefined}
+                          title="Double-click to add event"
                         >
                           {/* Day number */}
                           <div
                             className={cn(
                               'text-sm font-medium',
-                              today ? 'text-[#00F59B]' : inCurrentMonth ? 'text-surface-300' : 'text-surface-600'
+                              today ? 'text-[#00F59B]' : inCurrentMonth ? 'text-surface-300' : 'text-surface-500'
                             )}
                           >
                             {format(date, 'd')}
+                            {!inCurrentMonth && (
+                              <span className="text-[10px] ml-1 opacity-70">{format(date, 'MMM')}</span>
+                            )}
                           </div>
 
                           {/* Spacer for multi-day events */}
@@ -878,6 +890,7 @@ export function DailyViewModal({ month, year, events, onClose }: DailyViewModalP
                                 event={event} 
                                 onDragStart={handleDragStart}
                                 onExtendStart={handleExtendStart}
+                                onEditEvent={setEditingEvent}
                               />
                             ))}
                             {dayEvents.length > 3 && (
@@ -1164,6 +1177,14 @@ export function DailyViewModal({ month, year, events, onClose }: DailyViewModalP
           dateStr={addingToDate}
           onClose={() => setAddingToDate(null)}
           onAdd={handleAddEvent}
+        />
+      )}
+
+      {/* Edit Event Modal */}
+      {editingEvent && (
+        <EditEventModal
+          event={editingEvent}
+          onClose={() => setEditingEvent(null)}
         />
       )}
     </div>

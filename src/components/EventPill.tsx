@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { CalendarEvent, EVENT_TYPE_COLORS } from '@/lib/types';
 import { formatDate, formatDateRange, cn } from '@/lib/utils';
 import { useAppStore } from '@/lib/store';
-import { Flag, GraduationCap, BookOpen, Sun, Star, Target, Rocket, X, Check, Clock } from 'lucide-react';
+import { Flag, GraduationCap, BookOpen, Sun, Star, Target, Rocket, X, Clock } from 'lucide-react';
+import { EditEventModal } from './EditEventModal';
 
 interface EventPillProps {
   event: CalendarEvent;
@@ -24,42 +25,15 @@ const TYPE_ICONS: Record<string, typeof Flag> = {
 };
 
 export function EventPill({ event, compact = false }: EventPillProps) {
-  const { updateEvent, deleteEvent } = useAppStore();
+  const { deleteEvent } = useAppStore();
   const [isHovered, setIsHovered] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(event.title);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
   const colorClass = EVENT_TYPE_COLORS[event.type] || 'gray';
   const Icon = TYPE_ICONS[event.type] || Star;
 
-  // Focus input when entering edit mode
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [isEditing]);
-
   const handleDoubleClick = () => {
-    setIsEditing(true);
-    setEditValue(event.title);
-  };
-
-  const handleSave = () => {
-    if (editValue.trim() && editValue.trim() !== event.title) {
-      updateEvent(event.id, { title: editValue.trim() });
-    }
-    setIsEditing(false);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSave();
-    } else if (e.key === 'Escape') {
-      setEditValue(event.title);
-      setIsEditing(false);
-    }
+    setIsEditModalOpen(true);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -79,7 +53,6 @@ export function EventPill({ event, compact = false }: EventPillProps) {
   const isDeadline = event.type === 'deadline';
   const isHighlightedType = isBrandMoment || isCampaign || isDeadline;
   const isPublicHoliday = event.type === 'publicHoliday';
-  const isGlobalEvent = event.brandId === null;
   
   // Custom color for deadline, VANHA green for public holidays, white for brand & campaigns, gray for others
   const textColor = isDeadline && event.customColor
@@ -97,8 +70,6 @@ export function EventPill({ event, compact = false }: EventPillProps) {
 
   // Format date range: "5 - 8 Jan" or "28 Jan - 2 Feb"
   const formatShortRange = (startDate: string, endDate: string) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
     const startDay = formatDate(startDate, 'd');
     const endDay = formatDate(endDate, 'd');
     const startMonth = formatDate(startDate, 'MMM');
@@ -109,33 +80,6 @@ export function EventPill({ event, compact = false }: EventPillProps) {
     }
     return `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
   };
-
-  if (isEditing) {
-    return (
-      <div className={cn(
-        'event-pill w-full flex items-center gap-1.5',
-        `event-pill-${colorClass}`,
-        isPublicHoliday && 'event-pill-holiday-green'
-      )}>
-        <Icon className="w-3 h-3 shrink-0 opacity-60" />
-        <input
-          ref={inputRef}
-          type="text"
-          value={editValue}
-          onChange={(e) => setEditValue(e.target.value)}
-          onBlur={handleSave}
-          onKeyDown={handleKeyDown}
-          className="flex-1 bg-transparent border-none outline-none text-white text-xs min-w-0"
-        />
-        <button
-          onClick={handleSave}
-          className="p-0.5 rounded hover:bg-white/20 text-green-400"
-        >
-          <Check className="w-3 h-3" />
-        </button>
-      </div>
-    );
-  }
 
   // Generate inline styles for deadline events
   const deadlineStyles = isDeadline && event.customColor ? {
@@ -186,6 +130,14 @@ export function EventPill({ event, compact = false }: EventPillProps) {
       >
         <X className="w-3 h-3" />
       </button>
+
+      {/* Edit Event Modal */}
+      {isEditModalOpen && (
+        <EditEventModal
+          event={event}
+          onClose={() => setIsEditModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

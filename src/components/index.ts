@@ -1,8 +1,10 @@
 export { BrandCard } from './BrandCard';
 export { BrandSettingsModal } from './BrandSettingsModal';
 export { CreateBrandModal } from './CreateBrandModal';
+export { DailyViewModal } from './DailyViewModal';
 export { DataAutoLoader } from './DataAutoLoader';
 export { DebugPanel } from './DebugPanel';
+export { EditEventModal } from './EditEventModal';
 export { EventDrawer } from './EventDrawer';
 export { EventPill } from './EventPill';
 export { MonthCard } from './MonthCard';

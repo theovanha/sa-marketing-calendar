@@ -8,14 +8,14 @@ import { EventPill } from './EventPill';
 import { DailyViewModal } from './DailyViewModal';
 import { ChevronDown, ChevronUp, Plus, CalendarDays } from 'lucide-react';
 
-// Event type options for the inline add form
+// Event type options for the inline add form (Brand first, then Campaign, then Deadline)
 const EVENT_TYPE_OPTIONS: { value: EventType; label: string; highlighted: boolean; hasColor?: boolean }[] = [
-  { value: 'keyDate', label: 'Key Date', highlighted: false },
-  { value: 'schoolTerm', label: 'School', highlighted: false },
-  { value: 'season', label: 'Season', highlighted: false },
   { value: 'brandMoment', label: 'Brand', highlighted: true },
   { value: 'campaignFlight', label: 'Campaign', highlighted: true },
   { value: 'deadline', label: 'Deadline', highlighted: false, hasColor: true },
+  { value: 'keyDate', label: 'Key Date', highlighted: false },
+  { value: 'schoolTerm', label: 'School', highlighted: false },
+  { value: 'season', label: 'Season', highlighted: false },
 ];
 
 interface MonthCardProps {
@@ -28,7 +28,7 @@ interface MonthCardProps {
 export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProps) {
   const monthName = MONTH_NAMES_SHORT[month];
   const fullMonthName = MONTH_NAMES[month];
-  const { selectedBrandId, setMonthNote, getMonthNote, createEvent } = useAppStore();
+  const { selectedBrandId, setMonthNote, getMonthNote, createEvent, setNoteHeight, getNoteHeight } = useAppStore();
   
   const [isExpanded, setIsExpanded] = useState(false);
   const [noteValue, setNoteValue] = useState('');
@@ -41,6 +41,7 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
   const [deadlineColor, setDeadlineColor] = useState(DEADLINE_COLORS[0]);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   // Check if event type supports multi-day
   const supportsMultiDay = (type: EventType) => 
@@ -50,7 +51,40 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
   useEffect(() => {
     const savedNote = getMonthNote(selectedBrandId, year, month);
     setNoteValue(savedNote);
-  }, [selectedBrandId, year, month, getMonthNote]);
+    
+    // Restore saved height
+    const savedHeight = getNoteHeight(selectedBrandId, year, month);
+    if (savedHeight && textareaRef.current) {
+      textareaRef.current.style.height = `${savedHeight}px`;
+    }
+  }, [selectedBrandId, year, month, getMonthNote, getNoteHeight]);
+  
+  // Track textarea resize using ResizeObserver
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    
+    let resizeTimeout: NodeJS.Timeout | null = null;
+    
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const height = entry.contentRect.height;
+        
+        // Debounce the save to avoid too many updates
+        if (resizeTimeout) clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          setNoteHeight(selectedBrandId, year, month, height);
+        }, 300);
+      }
+    });
+    
+    resizeObserver.observe(textarea);
+    
+    return () => {
+      resizeObserver.disconnect();
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+    };
+  }, [selectedBrandId, year, month, setNoteHeight]);
   
   // Focus input when showing add form
   useEffect(() => {
@@ -340,6 +374,7 @@ export function MonthCard({ month, year, events, maxVisible = 5 }: MonthCardProp
       {/* Notes section */}
       <div className="mt-2">
         <textarea
+          ref={textareaRef}
           value={noteValue}
           onChange={(e) => handleNoteChange(e.target.value)}
           placeholder="Notes..."
