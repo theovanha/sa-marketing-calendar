@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { DataAutoLoader } from '@/components/DataAutoLoader';
 import { UndoToast } from '@/components/UndoToast';
+import { ErrorToast } from '@/components/ErrorToast';
 import { DebugPanel } from '@/components/DebugPanel';
 import { InteractionDebugger } from '@/components/InteractionDebugger';
 
@@ -29,6 +30,7 @@ export default function RootLayout({
         <DataAutoLoader />
         {children}
         <UndoToast />
+        <ErrorToast />
         <DebugPanel />
         <InteractionDebugger />
       </body>

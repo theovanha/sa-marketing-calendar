@@ -5,6 +5,7 @@ export { DailyViewModal } from './DailyViewModal';
 export { DataAutoLoader } from './DataAutoLoader';
 export { DebugPanel } from './DebugPanel';
 export { EditEventModal } from './EditEventModal';
+export { ErrorToast } from './ErrorToast';
 export { EventDrawer } from './EventDrawer';
 export { EventPill } from './EventPill';
 export { MonthCard } from './MonthCard';

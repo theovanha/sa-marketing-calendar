@@ -240,6 +240,7 @@ export const useAppStore = create<AppState>()(
         
         set((state) => ({
           events: [...state.events, newEvent],
+          syncError: null, // Clear any previous error
         }));
         
         // Only sync brand events to Supabase (not global SA events)
@@ -248,6 +249,12 @@ export const useAppStore = create<AppState>()(
             await eventService.create(newEvent);
           } catch (error) {
             console.error('Failed to sync event to Supabase:', error);
+            // Set error state so UI can show feedback
+            set({ syncError: 'Failed to save event. Please try again.' });
+            // Remove the event from local state since it didn't save
+            set((state) => ({
+              events: state.events.filter(e => e.id !== newEvent.id),
+            }));
           }
         }
         
@@ -256,11 +263,13 @@ export const useAppStore = create<AppState>()(
       
       updateEvent: async (id, updates) => {
         const event = get().events.find(e => e.id === id);
+        const originalEvent = event ? { ...event } : null;
         
         set((state) => ({
           events: state.events.map((event) =>
             event.id === id ? { ...event, ...updates } : event
           ),
+          syncError: null,
         }));
         
         // Only sync brand events to Supabase
@@ -269,6 +278,15 @@ export const useAppStore = create<AppState>()(
             await eventService.update(id, updates);
           } catch (error) {
             console.error('Failed to sync event update to Supabase:', error);
+            set({ syncError: 'Failed to save changes. Please try again.' });
+            // Revert to original state
+            if (originalEvent) {
+              set((state) => ({
+                events: state.events.map((e) =>
+                  e.id === id ? originalEvent : e
+                ),
+              }));
+            }
           }
         }
       },
