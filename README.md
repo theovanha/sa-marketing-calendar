@@ -36,17 +36,18 @@ A 12-month South African performance marketing calendar for agencies. Plan campa
 - Separate calendars per brand
 - Global SA events shared across all brands
 
-### 💾 Local-First
-- Data stored in browser localStorage
-- No account required
-- Works offline
-- Privacy-friendly
+### 💾 Supabase-Backed
+- All data (brands, events, month notes, hidden events) lives in **Supabase** (Postgres)
+- The browser only stores **UI preferences** locally (selected brand/year, filters, note heights)
+- Optimistic updates with background sync — changes roll back if a save fails
+- No login yet (v1 uses the public anon key with allow-all row-level security)
 
 ## Getting Started
 
 ### Prerequisites
 - Node.js 18+
 - npm or yarn
+- A Supabase project (see **Environment / Supabase setup** below)
 
 ### Installation
 
@@ -61,7 +62,21 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3001](http://localhost:3001) in your browser.
+
+### Environment / Supabase setup
+
+Create a `.env.local` file in the project root (git-ignored) with your Supabase credentials:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-public-key>
+```
+
+Both values are in the Supabase dashboard under **Project Settings → API** (Project URL + the
+`anon` / public key). To create the database tables, run [`supabase-schema.sql`](supabase-schema.sql)
+in the Supabase SQL editor. On boot the app logs a `[SUPABASE_DEBUG]` line to the browser console
+confirming whether the URL and key were picked up.
 
 ### Loading the SA Dataset
 
