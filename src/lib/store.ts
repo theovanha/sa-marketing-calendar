@@ -554,7 +554,9 @@ export const useSelectedBrand = () => {
 
 export const useActiveBrands = () => {
   const { brands } = useAppStore();
-  return brands.filter((b) => !b.archived);
+  return brands
+    .filter((b) => !b.archived)
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
 };
 
 export const useSelectedEvent = () => {
